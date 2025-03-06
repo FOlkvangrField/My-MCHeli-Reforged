@@ -65,7 +65,7 @@ public class Mk1Eyeball {
     }
 
     public static boolean shouldRender(MCH_VisualContact c){
-        System.out.println("should render");
+        //System.out.println("should render");
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
         Entity e = player.worldObj.getEntityByID(c.entityId);
         if(e == null){return true;}

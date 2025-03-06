@@ -50,34 +50,90 @@ public class MCH_WeaponATMissile extends MCH_WeaponEntitySeeker {
 
    protected boolean shotClient(Entity entity, Entity user) {
       boolean result = false;
-      if(super.guidanceSystem.lock(user) && super.guidanceSystem.lastLockEntity != null) {
+      if(getInfo().passiveRadar) {
+         result = true;
+      } else if (super.guidanceSystem.lock(user) && super.guidanceSystem.lastLockEntity != null) {
          result = true;
          super.optionParameter1 = W_Entity.getEntityId(super.guidanceSystem.lastLockEntity);
+         super.optionParameter2 = this.getCurrentMode();
       }
-
-      super.optionParameter2 = this.getCurrentMode();
       return result;
    }
 
    protected boolean shotServer(MCH_WeaponParam prm) {
-      Entity tgtEnt = null;
-      tgtEnt = prm.user.worldObj.getEntityByID(prm.option1);
-      if(tgtEnt != null && !tgtEnt.isDead) {
+      if(getInfo().passiveRadar) {
          float yaw = prm.user.rotationYaw + super.fixRotationYaw;
          float pitch = prm.entity.rotationPitch + super.fixRotationPitch;
-         double tX = (double)(-MathHelper.sin(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
-         double tZ = (double)(MathHelper.cos(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
-         double tY = (double)(-MathHelper.sin(pitch / 180.0F * 3.1415927F));
-         MCH_EntityATMissile e = new MCH_EntityATMissile(super.worldObj, prm.posX, prm.posY, prm.posZ, tX, tY, tZ, yaw, pitch, (double)super.acceleration);
+         double tX = (double) (-MathHelper.sin(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
+         double tZ = (double) (MathHelper.cos(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
+         double tY = (double) (-MathHelper.sin(pitch / 180.0F * 3.1415927F));
+         MCH_EntityATMissile e = new MCH_EntityATMissile(super.worldObj, prm.posX, prm.posY, prm.posZ, tX, tY, tZ, yaw, pitch, (double) super.acceleration);
          e.setName(super.name);
          e.setParameterFromWeapon(this, prm.entity, prm.user);
-         e.setTargetEntity(tgtEnt);
          e.guidanceType = prm.option2;
          super.worldObj.spawnEntityInWorld(e);
          this.playSound(prm.entity);
          return true;
       } else {
-         return false;
+         Entity tgtEnt = null;
+         tgtEnt = prm.user.worldObj.getEntityByID(prm.option1);
+         if (tgtEnt != null && !tgtEnt.isDead) {
+            float yaw = prm.user.rotationYaw + super.fixRotationYaw;
+            float pitch = prm.entity.rotationPitch + super.fixRotationPitch;
+            double tX = (double) (-MathHelper.sin(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
+            double tZ = (double) (MathHelper.cos(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
+            double tY = (double) (-MathHelper.sin(pitch / 180.0F * 3.1415927F));
+            MCH_EntityATMissile e = new MCH_EntityATMissile(super.worldObj, prm.posX, prm.posY, prm.posZ, tX, tY, tZ, yaw, pitch, (double) super.acceleration);
+            e.setName(super.name);
+            e.setParameterFromWeapon(this, prm.entity, prm.user);
+            e.setTargetEntity(tgtEnt);
+            e.guidanceType = prm.option2;
+            super.worldObj.spawnEntityInWorld(e);
+            this.playSound(prm.entity);
+            return true;
+         } else {
+            return false;
+         }
+      }
+   }
+
+   @Override
+   public boolean lock(MCH_WeaponParam prm) {
+      if(!super.worldObj.isRemote) {
+         // do nothing
+      } else {
+         if(getInfo().passiveRadar) {
+            super.guidanceSystem.lock(prm.user);
+            if(guidanceSystem.isLockComplete()) {
+               Entity target = guidanceSystem.lastLockEntity;
+               //获取玩家射击的AT弹
+               for (MCH_EntityBaseBullet bullet : getShootBullets(worldObj, prm.user, getInfo().maxLockOnRange)) {
+                  bullet.clientSetTargetEntity(target);
+                  super.optionParameter1 = W_Entity.getEntityId(target);
+               }
+            }
+            else {
+               for (MCH_EntityBaseBullet bullet : getShootBullets(worldObj, prm.user, getInfo().maxLockOnRange)) {
+                  bullet.clientSetTargetEntity(null);
+                  super.optionParameter1 = 0;
+               }
+            }
+         }
+      }
+      return false;
+   }
+
+   @Override
+   public void onUnlock(MCH_WeaponParam prm) {
+      if(worldObj.isRemote) {
+         if (guidanceSystem != null && prm.user != null) {
+            if (!guidanceSystem.isLockComplete()) {
+               for (MCH_EntityBaseBullet bullet : getShootBullets(worldObj, prm.user, getInfo().maxLockOnRange)) {
+                  bullet.clientSetTargetEntity(null);
+                  super.optionParameter1 = 0;
+               }
+            }
+         }
       }
    }
 }

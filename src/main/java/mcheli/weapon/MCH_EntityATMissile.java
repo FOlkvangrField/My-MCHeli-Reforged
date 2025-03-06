@@ -1,8 +1,5 @@
 package mcheli.weapon;
 
-import mcheli.weapon.MCH_BulletModel;
-import mcheli.weapon.MCH_DefaultBulletModels;
-import mcheli.weapon.MCH_EntityBaseBullet;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
@@ -23,7 +20,7 @@ public class MCH_EntityATMissile extends MCH_EntityBaseBullet {
    public void onUpdate() {
       super.onUpdate();
       if(this.getInfo() != null && !this.getInfo().disableSmoke && super.ticksExisted >= this.getInfo().trajectoryParticleStartTick) {
-         this.spawnParticle(this.getInfo().trajectoryParticleName, 3, 5.0F * this.getInfo().smokeSize * 0.5F);
+         this.spawnExplosionParticle(this.getInfo().trajectoryParticleName, 3, 5.0F * this.getInfo().smokeSize * 0.5F);
       }
 
       if(!super.worldObj.isRemote) {
@@ -78,7 +75,7 @@ public class MCH_EntityATMissile extends MCH_EntityBaseBullet {
             }
          }
       } else {
-         this.setDead();
+         //this.setDead();
       }
 
    }

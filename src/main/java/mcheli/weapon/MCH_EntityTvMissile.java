@@ -1,9 +1,6 @@
 package mcheli.weapon;
 
 import mcheli.aircraft.MCH_EntityAircraft;
-import mcheli.weapon.MCH_BulletModel;
-import mcheli.weapon.MCH_DefaultBulletModels;
-import mcheli.weapon.MCH_EntityBaseBullet;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
@@ -27,7 +24,7 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
       super.onUpdate();
       this.onUpdateBomblet();
       if(this.isSpawnParticle && this.getInfo() != null && !this.getInfo().disableSmoke) {
-         this.spawnParticle(this.getInfo().trajectoryParticleName, 3, 5.0F * this.getInfo().smokeSize * 0.5F);
+         this.spawnExplosionParticle(this.getInfo().trajectoryParticleName, 3, 5.0F * this.getInfo().smokeSize * 0.5F);
       }
 
       if(super.shootingEntity != null) {

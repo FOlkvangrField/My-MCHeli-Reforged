@@ -9,9 +9,6 @@ import mcheli.helicopter.MCH_EntityHeli;
 import mcheli.plane.MCP_EntityPlane;
 import mcheli.tank.MCH_EntityTank;
 import mcheli.vehicle.MCH_EntityVehicle;
-import mcheli.weapon.MCH_BulletModel;
-import mcheli.weapon.MCH_Cartridge;
-import mcheli.weapon.MCH_SightType;
 import mcheli.wrapper.W_Item;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,6 +18,7 @@ import net.minecraft.item.ItemStack;
 public class MCH_WeaponInfo extends MCH_BaseInfo {
 
    public final String name;
+   public String explosionType;
    public int nukeYield;
    public int chemYield=0;
    public String displayName;
@@ -101,6 +99,69 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
    public List listMuzzleFlash;
    public List listMuzzleFlashSmoke;
 
+   /**
+    * 生成的方块破碎粒子数量
+    */
+   public int flakParticlesCrack = 10;
+   /**
+    * 生成的白色烟雾粒子数量
+    */
+   public int numParticlesFlak = 3;
+   /**
+    * 生成的方块破碎粒子扩散，推荐值0.1(步枪子弹) ~ 0.6(反坦克步枪)
+    */
+   public float flakParticlesDiff = 0.3F;
+   public String hitSound;
+   public String hitSoundIron = "hit_metal";
+   public float hitSoundRange;
+   public boolean hitSoundEnable = false;
+   public boolean entityHitSoundEnable = false;
+   /**
+    * 是否为红外弹，会受到热焰弹干扰
+    */
+   public boolean isHeatSeekerMissile = true;
+   /**
+    * 是否为雷达弹，会受到箔条干扰
+    */
+   public boolean isRadarMissile = false;
+   //弹药导引头最大导引角度
+   public int maxDegreeOfMissile = 60;
+   //脱锁延时，-1为永远锁定
+   public int tickEndHoming = -1;
+   /**
+    * 最大锁定距离
+    */
+   public int maxLockOnRange = 300;
+   /**
+    * 机载雷达最大锁定角度
+    */
+   public int maxLockOnAngle = 10;
+   /**
+    * 速度门雷达最大角度，超过此角度将脱锁 (也可用于红外弹尾后攻击)
+    */
+   public float pdHDNMaxDegree = 1000f;
+   /**
+    * 速度门雷达脱锁间隔，超过最大角度后，在该tick后导弹脱锁
+    */
+   public int pdHDNMaxDegreeLockOutCount = 10;
+   /**
+    * 导弹抗干扰时长，-1为不抗干扰
+    */
+   public int antiFlareCount = -1;
+   /**
+    * 雷达弹多径杂波检测高度，飞机低于这个高度将使雷达弹脱锁
+    */
+   public int lockMinHeight = 25;
+   /**
+    * 半主动雷达弹需要持续引导
+    */
+   public boolean passiveRadar = false;
+
+   /**
+    * 半主动雷达弹脱离引导后脱锁计时
+    */
+   public int passiveRadarLockOutCount = 20;
+
 
    public MCH_WeaponInfo(String name) {
       this.name = name;
@@ -179,6 +240,7 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
       this.fixCameraPitch = false;
       this.cameraRotationSpeedPitch = 1.0F;
       this.nukeYield=0;
+      this.explosionType="";
    }
 
    public void checkData() {
@@ -291,11 +353,50 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
             }
          } else if(item.compareTo("delay") == 0) {
             this.delay = this.toInt(data, 0, 100000);
+         } else if(item.equalsIgnoreCase("ExplosionType")) {
+            this.explosionType = data;
          } else if(item.equalsIgnoreCase("nukeYield")) {
             this.nukeYield = this.toInt(data, 0, 100000);
          } else if(item.equalsIgnoreCase("chemYield")) {
             this.chemYield = this.toInt(data, 0, 100000);
-         } else if(item.compareTo("reloadtime") == 0) {
+         } else if(item.equalsIgnoreCase("MaxDegreeOfMissile")) {
+            this.maxDegreeOfMissile = this.toInt(data, 0, 100000);
+         } else if(item.equalsIgnoreCase("TickEndHoming")) {
+            this.tickEndHoming = this.toInt(data, -1, 100000);
+         } else if(item.equalsIgnoreCase("FlakParticlesCrack")) {
+            this.flakParticlesCrack = this.toInt(data, 0, 300);
+         } else if(item.equalsIgnoreCase("ParticlesFlak")) {
+            this.numParticlesFlak = this.toInt(data, 0, 100);
+         } else if(item.equalsIgnoreCase("FlakParticlesDiff")) {
+            this.flakParticlesDiff = this.toFloat(data);
+         } else if(item.equalsIgnoreCase("IsRadarMissile")) {
+            this.isRadarMissile = this.toBool(data);
+         } else if(item.equalsIgnoreCase("IsHeatSeekerMissile")) {
+            this.isHeatSeekerMissile = this.toBool(data);
+         } else if(item.equalsIgnoreCase("MaxLockOnRange")) {
+            this.maxLockOnRange = this.toInt(data, 0, 2000);
+         } else if(item.equalsIgnoreCase("MaxLockOnAngle")) {
+            this.maxLockOnAngle = this.toInt(data, 0, 200);
+         }
+         else if(item.equalsIgnoreCase("PDHDNMaxDegree")) {
+            this.pdHDNMaxDegree = this.toFloat(data, -1, 90);
+         }
+         else if(item.equalsIgnoreCase("PDHDNMaxDegreeLockOutCount")) {
+            this.pdHDNMaxDegreeLockOutCount = this.toInt(data, 0, 200);
+         }
+         else if(item.equalsIgnoreCase("AntiFlareCount")) {
+            this.antiFlareCount = this.toInt(data, -1, 200);
+         }
+         else if(item.equalsIgnoreCase("LockMinHeight")) {
+            this.lockMinHeight = this.toInt(data, -1, 100);
+         }
+         else if(item.equalsIgnoreCase("PassiveRadar")) {
+            this.passiveRadar = this.toBool(data);
+         }
+         else if(item.equalsIgnoreCase("PassiveRadarLockOutCount")) {
+            this.passiveRadarLockOutCount = this.toInt(data, 0, 200);
+         }
+         else if(item.compareTo("reloadtime") == 0) {
             this.reloadTime = this.toInt(data, 3, 1000);
          } else if(item.compareTo("round") == 0) {
             this.round = this.toInt(data, 1, 30000);
@@ -322,7 +423,7 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
             } else if(item.equalsIgnoreCase("SoundPitchRandom")) {
                this.soundPitchRandom = this.toFloat(data, 0.0F, 1.0F);
             } else if(item.compareTo("locktime") == 0) {
-               this.lockTime = this.toInt(data, 2, 1000);
+               this.lockTime = this.toInt(data, 0, 1000);
             } else if(item.equalsIgnoreCase("RidableOnly")) {
                this.ridableOnly = this.toBool(data);
             } else if(item.compareTo("proximityfusedist") == 0) {

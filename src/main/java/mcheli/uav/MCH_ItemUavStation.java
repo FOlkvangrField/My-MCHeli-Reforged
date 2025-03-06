@@ -29,10 +29,7 @@ public class MCH_ItemUavStation extends W_Item {
 
    public MCH_EntityUavStation createUavStation(World world, double x, double y, double z, int kind) {
       MCH_EntityUavStation uavst = new MCH_EntityUavStation(world);
-      System.out.println("UavStation pos" + x + " " + y + " " + z);
-
       uavst.setPosition(x, y + (double)uavst.yOffset, z);
-      uavst.storeStationPosition();
       uavst.prevPosX = x;
       uavst.prevPosY = y;
       uavst.prevPosZ = z;
@@ -63,7 +60,7 @@ public class MCH_ItemUavStation extends W_Item {
          Vec3 vec32 = par3EntityPlayer.getLook(f);
          boolean flag = false;
          float f9 = 1.0F;
-         List<Entity> list = par2World.getEntitiesWithinAABBExcludingEntity(par3EntityPlayer, par3EntityPlayer.boundingBox.addCoord(vec32.xCoord * d3, vec32.yCoord * d3, vec32.zCoord * d3).expand((double)f9, (double)f9, (double)f9));
+         List list = par2World.getEntitiesWithinAABBExcludingEntity(par3EntityPlayer, par3EntityPlayer.boundingBox.addCoord(vec32.xCoord * d3, vec32.yCoord * d3, vec32.zCoord * d3).expand((double)f9, (double)f9, (double)f9));
 
          int i;
          for(i = 0; i < list.size(); ++i) {

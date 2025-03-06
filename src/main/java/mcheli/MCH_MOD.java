@@ -39,6 +39,7 @@ import mcheli.helicopter.MCH_HeliInfoManager;
 import mcheli.helicopter.MCH_ItemHeli;
 import mcheli.lweapon.MCH_ItemLightWeaponBase;
 import mcheli.lweapon.MCH_ItemLightWeaponBullet;
+import mcheli.network.PacketHandler;
 import mcheli.parachute.MCH_EntityParachute;
 import mcheli.parachute.MCH_ItemParachute;
 import mcheli.plane.MCP_EntityPlane;
@@ -89,7 +90,7 @@ import java.util.List;
 
 @Mod(
    modid = "mcheli",
-   name = "Mcheli Overdrive",
+   name = "Mcheli Reforged",
    dependencies = "required-after:Forge@[10.13.2.1230,)"
 )
 @NetworkMod(
@@ -138,7 +139,11 @@ public class MCH_MOD {
    public static MCH_DraftingTableBlock blockDraftingTable;
    public static MCH_DraftingTableBlock blockDraftingTableLit;
    public static Item sampleHelmet;
+   public static final PacketHandler newPacketHandler = new PacketHandler();
 
+   public static PacketHandler getPacketHandler() {
+      return newPacketHandler;
+   }
 
    @EventHandler
    public void PreInit(FMLPreInitializationEvent evt) {
@@ -148,13 +153,16 @@ public class MCH_MOD {
      //    ZipEntry entry = zis.getNextEntry();
      // }
       //sorry but we're gonna need a loader mod to unzip this crap
+
       VER = Loader.instance().activeModContainer().getVersion();
       MCH_Lib.init();
       MCH_Lib.Log("MC Ver:1.7.10 MOD Ver:" + VER + "", new Object[0]);
       MCH_Lib.Log("Start load...", new Object[0]);
       sourcePath = Loader.instance().activeModContainer().getSource().getPath();
+              //new File(evt.getModConfigurationDirectory().getParentFile(), "/mods").getPath();
       MCH_Lib.Log("SourcePath: " + sourcePath, new Object[0]);
       MCH_Lib.Log("CurrentDirectory:" + (new File(".")).getAbsolutePath(), new Object[0]);
+
       proxy.init();
       creativeTabs = new MCH_CreativeTabs("MC Heli Item");
       creativeTabsHeli = new MCH_CreativeTabs("MC Heli Helicopters");
@@ -239,17 +247,18 @@ public class MCH_MOD {
 
 
 
-      @EventHandler
+   @EventHandler
    public void init(FMLInitializationEvent evt) {
+      getPacketHandler().initialise();
       GameRegistry.registerTileEntity(MCH_DraftingTableTileEntity.class, "drafting_table");
       proxy.registerBlockRenderer();
-
    }
 
 
 
    @EventHandler
    public void postInit(FMLPostInitializationEvent evt) {
+      getPacketHandler().postInitialise();
       MCH_Config var10001 = config;
       creativeTabs.setFixedIconItem(MCH_Config.CreativeTabIcon.prmString);
       var10001 = config;
@@ -278,18 +287,18 @@ public class MCH_MOD {
 
       public void registerEntity() {
       EntityRegistry.registerModEntity(MCH_EntitySeat.class, "MCH.E.Seat", 100, this, 200, 10, true);
-      EntityRegistry.registerModEntity(MCH_EntityHeli.class, "MCH.E.Heli", 101, this, 200, 10, true);
+      EntityRegistry.registerModEntity(MCH_EntityHeli.class, "MCH.E.Heli", 101, this, 500, 10, true);
       EntityRegistry.registerModEntity(MCH_EntityGLTD.class, "MCH.E.GLTD", 102, this, 200, 10, true);
-      EntityRegistry.registerModEntity(MCP_EntityPlane.class, "MCH.E.Plane", 103, this, 200, 10, true);
+      EntityRegistry.registerModEntity(MCP_EntityPlane.class, "MCH.E.Plane", 103, this, 500, 10, true);
       EntityRegistry.registerModEntity(MCH_EntityChain.class, "MCH.E.Chain", 104, this, 200, 10, true);
       EntityRegistry.registerModEntity(MCH_EntityHitBox.class, "MCH.E.PSeat", 105, this, 200, 10, true);
       EntityRegistry.registerModEntity(MCH_EntityParachute.class, "MCH.E.Parachute", 106, this, 200, 10, true);
       EntityRegistry.registerModEntity(MCH_EntityContainer.class, "MCH.E.Container", 107, this, 200, 10, true);
-      EntityRegistry.registerModEntity(MCH_EntityVehicle.class, "MCH.E.Vehicle", 108, this, 200, 10, true);
+      EntityRegistry.registerModEntity(MCH_EntityVehicle.class, "MCH.E.Vehicle", 108, this, 500, 10, true);
       EntityRegistry.registerModEntity(MCH_EntityUavStation.class, "MCH.E.UavStation", 109, this, 200, 10, true);
       EntityRegistry.registerModEntity(MCH_EntityHitBox.class, "MCH.E.HitBox", 110, this, 200, 10, true);
       EntityRegistry.registerModEntity(MCH_EntityHide.class, "MCH.E.Hide", 111, this, 200, 10, true);
-      EntityRegistry.registerModEntity(MCH_EntityTank.class, "MCH.E.Tank", 112, this, 200, 10, true);
+      EntityRegistry.registerModEntity(MCH_EntityTank.class, "MCH.E.Tank", 112, this, 500, 10, true);
       EntityRegistry.registerModEntity(MCH_EntityRocket.class, "MCH.E.Rocket", 200, this, 530, 5, true);
       EntityRegistry.registerModEntity(MCH_EntityTvMissile.class, "MCH.E.TvMissle", 201, this, 530, 5, true);
       EntityRegistry.registerModEntity(MCH_EntityBullet.class, "MCH.E.Bullet", 202, this, 530, 5, true);
@@ -482,7 +491,7 @@ public class MCH_MOD {
       itemGLTD = item;
       registerItem(item, "gltd", creativeTabs);
       W_LanguageRegistry.addName(item, "GLTD:Target Designator");
-      W_LanguageRegistry.addNameForObject(item, "ja_JP", "GLTD:レーザー目標指示装置");
+      W_LanguageRegistry.addNameForObject(item, "zh_CN", "SOFLAM 空袭指示器");
    }
 
    public static void registerItem(W_Item item, String name, MCH_CreativeTabs ct) {

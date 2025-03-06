@@ -49,6 +49,7 @@ public class MCH_Config {
    public static MCH_ConfigPrm KeyEjectHeli;
    public static MCH_ConfigPrm KeyAttack;
    public static MCH_ConfigPrm KeyUseWeapon;
+   public static MCH_ConfigPrm KeyCurrentWeaponLock;
    public static MCH_ConfigPrm KeySwitchWeapon1;
    public static MCH_ConfigPrm KeySwitchWeapon2;
    public static MCH_ConfigPrm KeySwWeaponMode;
@@ -155,6 +156,31 @@ public class MCH_Config {
    public static MCH_ConfigPrm RangeFinderConsume;
    public static MCH_ConfigPrm EnablePutRackInFlying;
    public static MCH_ConfigPrm EnableDebugBoundingBox;
+
+   //TODO mch1.0.5 -> mchr
+   public static MCH_ConfigPrm DespawnCount;
+
+   public static MCH_ConfigPrm HitBoxDelayTick;
+
+   public static MCH_ConfigPrm EnableRotationLimit;
+
+   public static MCH_ConfigPrm PitchLimitMax;
+
+   public static MCH_ConfigPrm PitchLimitMin;
+
+   public static MCH_ConfigPrm RollLimit;
+
+   public static MCH_ConfigPrm RangeOfGunner_VsMonster_Vertical;
+
+   public static MCH_ConfigPrm RangeOfGunner_VsMonster_Horizontal;
+
+   public static MCH_ConfigPrm RangeOfGunner_VsPlayer_Vertical;
+
+   public static MCH_ConfigPrm RangeOfGunner_VsPlayer_Horizontal;
+
+   public static MCH_ConfigPrm FixVehicleAtPlacedPoint;
+
+   public static MCH_ConfigPrm KillPassengersWhenDestroyed;
    public static MCH_ConfigPrm ItemID_Fuel;
    public static MCH_ConfigPrm ItemID_GLTD;
    public static MCH_ConfigPrm ItemID_Chain;
@@ -214,7 +240,8 @@ public class MCH_Config {
       KeySwitchHovering = new MCH_ConfigPrm("KeySwitchHovering", 57);
       KeyEjectHeli = new MCH_ConfigPrm("KeyEjectHeli", 54);
       KeyAttack = new MCH_ConfigPrm("KeyAttack", -100);
-      KeyUseWeapon = new MCH_ConfigPrm("KeyUseWeapon", -99);
+      KeyUseWeapon = new MCH_ConfigPrm("KeyUseWeapon", -100);
+      KeyCurrentWeaponLock = new MCH_ConfigPrm("KeyCurrentWeaponLock", -99);
       KeySwitchWeapon1 = new MCH_ConfigPrm("KeySwitchWeapon1", -98);
       KeySwitchWeapon2 = new MCH_ConfigPrm("KeySwitchWeapon2", 34);
       KeySwWeaponMode = new MCH_ConfigPrm("KeySwitchWeaponMode", 45);
@@ -320,6 +347,18 @@ public class MCH_Config {
       RangeFinderConsume = new MCH_ConfigPrm("RangeFinderConsume", true);
       EnablePutRackInFlying = new MCH_ConfigPrm("EnablePutRackInFlying", true);
       EnableDebugBoundingBox = new MCH_ConfigPrm("EnableDebugBoundingBox", true);
+      DespawnCount = new MCH_ConfigPrm("DespawnCount", 25);
+      HitBoxDelayTick = new MCH_ConfigPrm("HitBoxDelayTick", 0);
+      EnableRotationLimit = new MCH_ConfigPrm("EnableRotationLimit", false);
+      PitchLimitMax = new MCH_ConfigPrm("PitchLimitMax", 10);
+      PitchLimitMin = new MCH_ConfigPrm("PitchLimitMin", -10);
+      RollLimit = new MCH_ConfigPrm("RollLimit", 35);
+      RangeOfGunner_VsMonster_Horizontal = new MCH_ConfigPrm("RangeOfGunner_VsMonster_Horizontal", 80);
+      RangeOfGunner_VsMonster_Vertical = new MCH_ConfigPrm("RangeOfGunner_VsMonster_Vertical", 160);
+      RangeOfGunner_VsPlayer_Horizontal = new MCH_ConfigPrm("RangeOfGunner_VsPlayer_Horizontal", 200);
+      RangeOfGunner_VsPlayer_Vertical = new MCH_ConfigPrm("RangeOfGunner_VsPlayer_Vertical", 300);
+      FixVehicleAtPlacedPoint = new MCH_ConfigPrm("FixVehicleAtPlacedPoint", true);
+      KillPassengersWhenDestroyed = new MCH_ConfigPrm("KillPassengersWhenDestroyed", false);
       hitMarkColorAlpha = 1.0F;
       hitMarkColorRGB = 16711680;
       ItemRecipe_Fuel = new MCH_ConfigPrm("ItemRecipe_Fuel", "\"ICI\", \"III\", I, iron_ingot, C, coal");
@@ -493,7 +532,15 @@ public class MCH_Config {
             }
          }
       }
-
+      if (DespawnCount.prmInt <= 0)
+         DespawnCount.prmInt = 1;
+      if (HitBoxDelayTick.prmInt < 0)
+         HitBoxDelayTick.prmInt = 0;
+      if (HitBoxDelayTick.prmInt > 50)
+         HitBoxDelayTick.prmInt = 50;
+      PitchLimitMax.prmInt = (PitchLimitMax.prmInt > 80) ? 80 : (Math.max(PitchLimitMax.prmInt, 0));
+      PitchLimitMin.prmInt = (PitchLimitMin.prmInt < -80) ? -80 : (Math.min(PitchLimitMin.prmInt, 0));
+      RollLimit.prmInt = (RollLimit.prmInt > 80) ? 80 : (Math.max(RollLimit.prmInt, 0));
       if(var10) {
          DamageVs.add(new MCH_ConfigPrm("DamageVsEntity", "3.0, flansmod"));
          DamageVs.add(new MCH_ConfigPrm("DamageMCHeliAircraftByExternal", "0.5, flansmod"));

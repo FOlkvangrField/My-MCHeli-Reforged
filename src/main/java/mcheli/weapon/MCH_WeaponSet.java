@@ -350,6 +350,21 @@ public class MCH_WeaponSet {
 
    }
 
+   public boolean lock(MCH_WeaponParam prm) {
+      MCH_WeaponBase crtWpn = this.getCurrentWeapon();
+      if(crtWpn != null && crtWpn.getInfo() != null) {
+         return crtWpn.lock(prm);
+      }
+      return false;
+   }
+
+   public void onUnlock(MCH_WeaponParam prm) {
+      MCH_WeaponBase crtWpn = this.getCurrentWeapon();
+      if(crtWpn != null && crtWpn.getInfo() != null) {
+         crtWpn.onUnlock(prm);
+      }
+   }
+
    public boolean use(MCH_WeaponParam prm) {
       MCH_WeaponBase crtWpn = this.getCurrentWeapon();
       if(crtWpn != null && crtWpn.getInfo() != null) {

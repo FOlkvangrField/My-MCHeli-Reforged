@@ -1,8 +1,12 @@
 package mcheli;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Iterator;
+import java.util.List;
+
 import mcheli.MCH_ClientEventHook;
 import mcheli.MCH_ClientTickHandlerBase;
 import mcheli.MCH_Config;
@@ -12,11 +16,7 @@ import mcheli.MCH_MOD;
 import mcheli.MCH_PacketIndOpenScreen;
 import mcheli.MCH_ServerSettings;
 import mcheli.MCH_ViewEntityDummy;
-import mcheli.aircraft.MCH_AircraftInfo;
-import mcheli.aircraft.MCH_ClientSeatTickHandler;
-import mcheli.aircraft.MCH_EntityAircraft;
-import mcheli.aircraft.MCH_EntitySeat;
-import mcheli.aircraft.MCH_SeatInfo;
+import mcheli.aircraft.*;
 import mcheli.command.MCH_GuiTitle;
 import mcheli.gltd.MCH_ClientGLTDTickHandler;
 import mcheli.gltd.MCH_EntityGLTD;
@@ -99,6 +99,7 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
    private static double mouseRollDeltaY = 0.0D;
    private static boolean isRideAircraft = false;
    private static float prevTick = 0.0F;
+   public static double smoothing;
 
 
    public MCH_ClientCommonTickHandler(Minecraft minecraft, MCH_Config config) {
@@ -609,6 +610,17 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
          return true;
       } else {
          return false;
+      }
+   }
+
+   @SubscribeEvent
+   public void renderTick(TickEvent.RenderTickEvent event) {
+      switch (event.phase) {
+         case START:
+            smoothing = event.renderTickTime;
+            break;
+         case END:
+            break;
       }
    }
 

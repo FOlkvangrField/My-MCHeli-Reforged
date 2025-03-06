@@ -22,7 +22,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -31,15 +30,11 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
 
    private MCP_PlaneInfo planeInfo = null;
    public float soundVolume;
-   public float liftfactor;
-   public float stallfactor;
    public MCH_Parts partNozzle;
    public MCH_Parts partWing;
    public float rotationRotor;
    public float prevRotationRotor;
    public float addkeyRotValue;
-   public float maxfueldiv = this.getMaxFuel() / 800;
-   public int timer = 0;
 
 
    public MCP_EntityPlane(World world) {
@@ -53,8 +48,6 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
       super.motionZ = 0.0D;
       super.weapons = this.createWeapon(0);
       this.soundVolume = 0.0F;
-      this.liftfactor = 0.08F;
-      this.stallfactor = 0.80F;
       this.partNozzle = null;
       this.partWing = null;
       super.stepHeight = 0.6F;
@@ -165,16 +158,6 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
             }
          }
 
-         //prevRotationYaw
-//todo possible deletion
-         if (this.prevRotationYaw > this.aircraftYaw || this.prevRotationYaw < this.aircraftYaw) {//if(this.aircraftYaw.isupdated)
-            if (this.getThrottle() > 0.2) {
-               double difference = this.aircraftYaw - this.prevRotationYaw;
-               this.currentSpeed = this.currentSpeed - difference;
-               this.setThrottle(this.getThrottle() - 0.06);
-            }
-         }
-         //end
          if(super.lastRiddenByEntity == null && this.getRiddenByEntity() != null) {
             this.initCurrentWeapon(this.getRiddenByEntity());
          }
@@ -194,111 +177,8 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
             this.prevRotationRotor += 360.0F;
          }
 
-         //todo: use super.onGround to better check crash physics
          if(super.onGround && this.getVtolMode() == 0 && this.planeInfo.isDefaultVtol) {
             this.swithVtolMode(true);
-         }
-
-         if(this.aircraftPitch <= -25 && this.isEntityAlive() && this.isAirBorne) { //if the aircraft is 25 degrees up
-            //maybe add more checks here to ensure this is a plane although idk if this is causing the dancing vehicles bug
-
-            // double throttlereal = this.getThrottle(); //decrease throttle slowly over time if the aircraft is pitched upwards
-            // throttlereal -= 0.1;
-            // this.setThrottle(throttlereal);
-            // addCurrentThrottle(-throttlereal);
-         }
-
-         if (this.aircraftPitch <= 3 && this.isEntityAlive() && this.isAirBorne) {//and 3 degrees down is greater
-            this.motionY = (this.motionY*0.61)+this.aircraftPitch; //go up
-            this.aircraftY = this.aircraftY + (this.aircraftY*1.2);
-            this.currentSpeed *= (this.currentSpeed*2)+this.aircraftPitch+(this.getMaxFuel()/800)+this.motionY;
-         }
-
-         //if this.aircraftPitch <= -15
-
-         if(this.getThrottle() <= 0.90 && this.isAirBorne) { //should apply a slow descent
-            this.aircraftY = this.aircraftY - (this.aircraftY*(0.2*this.getThrottle()));
-         }
-
-
-
-         //TODO: if (this.motionY >= 2.0 && this.landing) { apply damage
-         //todo: add the check for flying hurty was put in wrong place
-         //this.getAlt();
-         if(this.motionY <= -2.0) { // I cannot detect if the aircraft hit or touched the ground
-
-         }
-
-         if(this.aircraftPitch >= 1.2 && this.isEntityAlive() && this.isAirBorne) { //going down save this.motionY for helicopters
-
-
-            this.currentSpeed *= (this.currentSpeed*6)+this.aircraftPitch+(this.getMaxFuel()/800)+this.motionY; //speed up
-
-
-
-            //added a timer because aircraft fell too fast, this will later be declared in the aircraft so for heavier aircraft the timer is faster to activate
-
-
-
-
-            //todo: debug and ensure this works as intended
-
-         }
-
-         if (this.aircraftPitch >= 80 && this.isEntityAlive() && this.isAirBorne) { // Begin dive logic
-            timer++;
-
-            // Base acceleration factors
-            double baseAcceleration = 0.01; // Slower acceleration initially
-            double pitchFactor = Math.min(this.aircraftPitch / 90.0, 1.0); // Normalize pitch to range [0, 1]
-
-            // Smooth acceleration: builds up over time
-            double timeFactor = Math.min(timer / 3200.0, 1.0); // Gradually increase until maxed out after 1200 *adjusted to be 3200 ticks
-
-            // Calculate vertical motion with air resistance
-            double airResistance = 0.97; // Resistance to motion for realism
-            this.motionY = (this.motionY * airResistance) + (baseAcceleration * pitchFactor * timeFactor);
-
-            // Apply the same logic for aircraftY if necessary
-            this.aircraftY = this.aircraftY * airResistance;
-
-            // Handle prolonged dives with a smoother transition
-            if (timer > 3200) {
-               double prolongedDiveFactor = 1 + ((timer - 3200) / 2400.0); // Gradually increase the effect over time
-               this.motionY += prolongedDiveFactor * baseAcceleration * pitchFactor;
-
-               // Reset the dive if pitch drops below a threshold
-               if (this.aircraftPitch <= 20.0) { //everything is inverse because mcheli hates everything and anything normal
-                  timer = 0; // Reset dive mechanics
-
-               }
-            }
-         }
-
-         if(this.motionY >= this.stallfactor) { //stall factor is 80 for now
-            double v1 = this.motionX - this.liftfactor; //how about stallfactor divided by 2 instead of liftfactor here? //it works ok
-            double v2 = this.motionZ - this.liftfactor;
-            this.currentSpeed = this.currentSpeed - this.stallfactor/4; //was 8
-            double identify = this.motionY - this.stallfactor;
-            if (v1 < 0) {
-               // Apply gradual deceleration
-               v1 += 0.1; // Adjust the value as needed
-               if (v1 > 0) {
-                  v1 = 0; // Ensure it doesn't go past 0
-               }
-            }
-            if (v2 < 0) {
-               // Apply gradual deceleration
-               v2 += 0.1; // Adjust the value as needed
-               if (v2 > 0) {
-                  v2 = 0; // Ensure it doesn't go past 0
-               }
-            }
-            //this.stallfactor;
-            this.motionX = v1;
-            this.motionZ = v2;
-            //sets motionY to be slowed
-            this.motionY = identify;
          }
 
          super.prevPosX = super.posX;
@@ -388,7 +268,7 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
       if(!MCH_Config.MouseControlFlightSimMode.prmBool && this.getVtolMode() != 0) {
          rot *= 0.0F;
       }
-      //todo another one AAAAAAAAAAAAAA
+
       if(super.moveLeft && !super.moveRight) {
          this.addkeyRotValue -= rot * partialTicks;
       }
@@ -431,15 +311,12 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
                }
             }
 
-            //todo another one AAAAAAAAAAAAAA
             if(super.moveLeft && !super.moveRight) {
                this.setRotYaw(this.getRotYaw() - 0.6F * rot * partialTicks);
-               this.currentSpeed = currentSpeed - rot;
             }
 
             if(super.moveRight && !super.moveLeft) {
                this.setRotYaw(this.getRotYaw() + 0.6F * rot * partialTicks);
-               this.currentSpeed = currentSpeed - rot;
             }
          }
 
@@ -802,26 +679,46 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
 
       boolean levelOff = super.isGunnerMode;
       if(dp == 0.0D) {
-         if(this.isTargetDrone() && this.canUseFuel() && !this.isDestroyed()) {
-            Block throttle = MCH_Lib.getBlockY(this, 3, -40, true);
-            if(throttle != null && !W_Block.isEqual(throttle, Blocks.air)) {
+         // 如果是目标无人机，并且有足够的燃料且没有被摧毁，则执行以下代码
+         if (this.isTargetDrone() && this.canUseFuel() && !this.isDestroyed()) {
+
+            // 获取无人机当前位置3个单位向下、40个单位向前的方块
+            Block throttle = MCH_Lib.getBlockY(this, 3, -100, true);
+
+            // 如果方块不为空且不是空气方块（即存在某个物体）
+            if (throttle != null && !W_Block.isEqual(throttle, Blocks.air)) {
+
+               // 如果没有找到目标方块，或者目标方块是空气方块，则执行下面的代码
                throttle = MCH_Lib.getBlockY(this, 3, -5, true);
-               if(throttle == null || W_Block.isEqual(throttle, Blocks.air)) {
+
+               // 如果目标方块为空或是空气方块，进行自动驾驶的旋转和俯仰调整
+               if (throttle == null || W_Block.isEqual(throttle, Blocks.air)) {
+
+                  // 根据自动驾驶旋转量调整航向（Yaw）
                   this.setRotYaw(this.getRotYaw() + this.getAcInfo().autoPilotRot * 2.0F);
-                  if(this.getRotPitch() > -20.0F) {
+
+                  // 如果俯仰角度大于-20度，则逐渐减小俯仰角度
+                  if (this.getRotPitch() > -20.0F) {
                      this.setRotPitch(this.getRotPitch() - 0.5F);
                   }
                }
             } else {
+               // 如果没有遇到障碍物，则按照自动驾驶的旋转量调整航向（Yaw）
                this.setRotYaw(this.getRotYaw() + this.getAcInfo().autoPilotRot * 1.0F);
+
+               // 自动调整俯仰角度，使其逐渐减小
                this.setRotPitch(this.getRotPitch() * 0.95F);
-               if(this.canFoldLandingGear()) {
+
+               // 如果可以收起起落架，则执行收起起落架的操作
+               if (this.canFoldLandingGear()) {
                   this.foldLandingGear();
                }
 
+               // 标记为平稳飞行状态
                levelOff = true;
             }
          }
+
 
          if(!levelOff) {
             super.motionY += 0.04D + (double)(!this.isInWater()?this.getAcInfo().gravity:this.getAcInfo().gravityInWater);
@@ -907,31 +804,17 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
       }
 
       if(super.onGround || MCH_Lib.getBlockIdY(this, 1, -2) > 0) {
-         //todo if this.throttledown
-         if(this.getAcInfo().throttleUpDown > 0.0F) {
-            super.motionX *= (double) this.getAcInfo().motionFactor;
-            super.motionZ *= (double) this.getAcInfo().motionFactor;
-         }
-         if (this.getAcInfo().throttleUpDown <= 0.0F) {
-            super.motionX /= (double) this.getAcInfo().motionFactor;
-            super.motionZ /= (double) this.getAcInfo().motionFactor;
-         }
+         super.motionX *= (double)this.getAcInfo().motionFactor;
+         super.motionZ *= (double)this.getAcInfo().motionFactor;
          if(MathHelper.abs(this.getRotPitch()) < 40.0F) {
             this.applyOnGroundPitch(0.8F);
          }
       }
 
       this.moveEntity(super.motionX, super.motionY, super.motionZ);
-      //super.motionY *= 0.95D;
-      //todo here aswell
-      if(this.getAcInfo().throttleUpDown > 0.0F) {
-         super.motionX *= (double) this.getAcInfo().motionFactor;
-         super.motionZ *= (double) this.getAcInfo().motionFactor;
-      }
-      if (this.getAcInfo().throttleUpDown <= 0.0F) {
-         super.motionX /= (double) this.getAcInfo().motionFactor;
-         super.motionZ /= (double) this.getAcInfo().motionFactor;
-      }
+      super.motionY *= 0.95D;
+      super.motionX *= (double)this.getAcInfo().motionFactor;
+      super.motionZ *= (double)this.getAcInfo().motionFactor;
       this.setRotation(this.getRotYaw(), this.getRotPitch());
       this.onUpdate_updateBlock();
       if(this.getRiddenByEntity() != null && this.getRiddenByEntity().isDead) {

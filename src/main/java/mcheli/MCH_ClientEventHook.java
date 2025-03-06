@@ -136,9 +136,9 @@ public class MCH_ClientEventHook extends W_ClientEventHook {
    }
 
    public void renderLivingEventPost(net.minecraftforge.client.event.RenderLivingEvent.Post event) {
-      MCH_RenderAircraft.renderEntityMarker(event.entity);
       MCH_GuiTargetMarker.addMarkEntityPos(2, event.entity, event.x, event.y + (double)event.entity.height + 0.5D, event.z);
       MCH_ClientLightWeaponTickHandler.markEntity(event.entity, event.x, event.y + (double)(event.entity.height / 2.0F), event.z);
+      MCH_RenderAircraft.renderEntityMarker(event.entity);
    }
 
    public void renderPlayerPre(net.minecraftforge.client.event.RenderPlayerEvent.Pre event) {

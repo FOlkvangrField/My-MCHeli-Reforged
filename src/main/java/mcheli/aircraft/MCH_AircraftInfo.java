@@ -102,13 +102,14 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
    public Vec3 turretPosition;
    public boolean defaultFreelook;
    public Vec3 unmountPosition;
+   public float thirdPersonDist;
    public float markerWidth;
    public float markerHeight;
    public float bbZmin;
    public float bbZmax;
    public float bbZ;
    public boolean alwaysCameraView;
-   public List cameraPosition;
+   public List<CameraPosition> cameraPosition;
    public float cameraRotationSpeed;
    public float speed;
    public float motionFactor;
@@ -123,7 +124,7 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
    public boolean limitRotation;
    public float throttleUpDown;
    public float throttleUpDownOnEntity;
-   private List textureNameList;
+    private List textureNameList;
    public int textureCount;
    public float particlesScale;
    public boolean hideEntity;
@@ -150,7 +151,11 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
    private int lastWeaponIndex = -1;
    private MCH_AircraftInfo.PartWeapon lastWeaponPart;
 
-
+   public EnumRadarType radarType = EnumRadarType.EARLY_AA;
+   public String nameOnModernAARadar = "?";
+   public String nameOnEarlyAARadar = "?";
+   public String nameOnModernASRadar = "?";
+   public String nameOnEarlyASRadar = "?";
 
    public abstract Item getItem();
 
@@ -240,6 +245,7 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
       this.turretPosition = Vec3.createVectorHelper(0.0D, 0.0D, 0.0D);
       this.defaultFreelook = false;
       this.unmountPosition = null;
+      this.thirdPersonDist = 4.0F;
       this.cameraPosition = new ArrayList();
       this.alwaysCameraView = false;
       this.cameraRotationSpeed = 1000.0F;
@@ -530,7 +536,26 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
                   this.repairOtherVehiclesValue = this.toInt(s[1], 0, 10000000);
                }
             }
-         } else if(item.compareTo("itemid") == 0) {
+         }
+
+         else if(item.equalsIgnoreCase("RadarType")) {
+            try {
+               this.radarType = EnumRadarType.valueOf(data);
+            } catch (Exception e) {
+               this.radarType = EnumRadarType.MODERN_AA;
+            }
+         }
+         else if(item.equalsIgnoreCase("NameOnModernAARadar")) {
+            nameOnModernAARadar = data;
+         }else if(item.equalsIgnoreCase("NameOnEarlyAARadar")) {
+            nameOnEarlyAARadar = data;
+         }else if(item.equalsIgnoreCase("NameOnModernASRadar")) {
+            nameOnModernASRadar = data;
+         }else if(item.equalsIgnoreCase("NameOnEarlyASRadar")) {
+            nameOnEarlyASRadar = data;
+         }
+
+         else if(item.compareTo("itemid") == 0) {
             this.itemID = this.toInt(data, 0, '\uffff');
          } else if(item.compareTo("addtexture") == 0) {
             this.textureNameList.add(data.toLowerCase());
@@ -691,6 +716,8 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
                                     if(s.length >= 3) {
                                        this.unmountPosition = this.toVec3(s[0], s[1], s[2]);
                                     }
+                                 } else if (item.equalsIgnoreCase("ThirdPersonDist")) {
+                                    this.thirdPersonDist = toFloat(data, 4.0F, 100.0F);
                                  } else if(item.equalsIgnoreCase("TurretPosition")) {
                                     s = data.split("\\s*,\\s*");
                                     if(s.length >= 3) {
@@ -1251,6 +1278,7 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
       this.lastWeaponPart = null;
       this.wheels.clear();
       this.unmountPosition = null;
+
    }
 
    public static String[] getCannotReloadItem() {

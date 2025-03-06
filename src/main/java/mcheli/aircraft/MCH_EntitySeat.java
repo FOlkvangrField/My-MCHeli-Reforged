@@ -90,15 +90,6 @@ public class MCH_EntitySeat extends W_Entity {
          System.out.println("this.lastRiddenByEntity instanceof EntityPlayer && this.riddenByEntity == null");
          EntityPlayer player = (EntityPlayer) this.lastRiddenByEntity;
 
-         if (this.parent != null && this.parent.getAcInfo().isNewUAV) {
-            System.out.println("[NEW UAV] Player dismounted! Teleporting to UAV Station.");
-            player.setPositionAndUpdate(
-                    MCH_EntityUavStation.storedStationX,
-                    MCH_EntityUavStation.storedStationY,
-                    MCH_EntityUavStation.storedStationZ
-            );
-         }
-
          this.lastRiddenByEntity = null; // Prevent repeat teleport
       }
 
