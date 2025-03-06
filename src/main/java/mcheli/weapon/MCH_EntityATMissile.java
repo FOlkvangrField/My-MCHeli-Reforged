@@ -27,7 +27,7 @@ public class MCH_EntityATMissile extends MCH_EntityBaseBullet {
          if(super.shootingEntity != null && super.targetEntity != null && !super.targetEntity.isDead) {
             this.onUpdateMotion();
          } else {
-            this.setDead();
+            //this.setDead();
          }
       }
 

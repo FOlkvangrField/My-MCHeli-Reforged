@@ -30,6 +30,7 @@ public abstract class MCH_WeaponEntitySeeker extends MCH_WeaponBase {
       this.guidanceSystem.passiveRadarLockOutCount = wi.passiveRadarLockOutCount;
    }
 
+   @Override
    public MCH_WeaponGuidanceSystem getGuidanceSystem() {
       return this.guidanceSystem;
    }

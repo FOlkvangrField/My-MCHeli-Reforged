@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class MCH_WeaponGuidanceSystem extends MCH_GuidanceSystem{
+public class MCH_WeaponGuidanceSystem extends MCH_EntityGuidanceSystem {
 
    public World worldObj;
    protected Entity user;
@@ -378,5 +378,20 @@ public class MCH_WeaponGuidanceSystem extends MCH_GuidanceSystem{
    protected Entity getLastLockEntity() {
       // TODO Auto-generated method stub
       return null;
+   }
+
+   @Override
+   public double getLockPosX() {
+      return targetEntity.posX;
+   }
+
+   @Override
+   public double getLockPosY() {
+      return targetEntity.posY;
+   }
+
+   @Override
+   public double getLockPosZ() {
+      return targetEntity.posZ;
    }
 }

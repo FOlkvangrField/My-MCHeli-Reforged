@@ -7,6 +7,7 @@ import mcheli.weapon.MCH_WeaponBase;
 import mcheli.weapon.MCH_WeaponInfo;
 import mcheli.weapon.MCH_WeaponParam;
 import mcheli.wrapper.W_Entity;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
@@ -17,6 +18,7 @@ public class MCH_WeaponTvMissile extends MCH_WeaponBase {
    protected MCH_EntityTvMissile lastShotTvMissile = null;
    protected Entity lastShotEntity = null;
    protected boolean isTVGuided = false;
+   public MCH_LaserGuidanceSystem guidanceSystem;
 
    //todo: add guided cluster munition type/bomblet handling
 
@@ -35,6 +37,17 @@ public class MCH_WeaponTvMissile extends MCH_WeaponBase {
       this.lastShotEntity = null;
       this.lastShotTvMissile = null;
       this.isTVGuided = false;
+
+      this.guidanceSystem = new MCH_LaserGuidanceSystem();
+      guidanceSystem.worldObj = w;
+      if(w.isRemote) {
+         guidanceSystem.user = Minecraft.getMinecraft().thePlayer;
+      }
+   }
+
+   @Override
+   public MCH_LaserGuidanceSystem getGuidanceSystem() {
+      return this.guidanceSystem;
    }
 
    public String getName() {
@@ -52,6 +65,7 @@ public class MCH_WeaponTvMissile extends MCH_WeaponBase {
 
    public void update(int countWait) {
       super.update(countWait);
+      this.guidanceSystem.update();
       if(!super.worldObj.isRemote) {
          if(this.isTVGuided && super.tick <= 9) {
             if(super.tick % 3 == 0 && this.lastShotTvMissile != null && !this.lastShotTvMissile.isDead && this.lastShotEntity != null && !this.lastShotEntity.isDead) {

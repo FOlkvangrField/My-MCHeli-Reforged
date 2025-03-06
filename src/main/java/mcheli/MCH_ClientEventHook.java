@@ -3,6 +3,9 @@ package mcheli;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import mcheli.MCH_ClientCommonTickHandler;
 import mcheli.MCH_ClientTickHandlerBase;
 import mcheli.MCH_Config;
@@ -27,6 +30,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.MouseEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderLivingEvent.Specials.Post;
 import net.minecraftforge.client.event.RenderLivingEvent.Specials.Pre;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -40,6 +44,7 @@ public class MCH_ClientEventHook extends W_ClientEventHook {
    private static final ResourceLocation ir_strobe = new ResourceLocation("mcheli", "textures/ir_strobe.png");
    private static boolean cancelRender = true;
 
+   public static float smoothing;
 
    public void renderLivingEventSpecialsPre(Pre event) {
       MCH_Config var10000 = MCH_MOD.config;
@@ -167,6 +172,25 @@ public class MCH_ClientEventHook extends W_ClientEventHook {
          MCH_ParticlesUtil.clearMarkPoint();
       }
 
+   }
+
+   @SubscribeEvent
+   public void renderTick(TickEvent.RenderTickEvent event) {
+      switch (event.phase) {
+         case START:
+            smoothing = event.renderTickTime;
+            break;
+         case END:
+            break;
+      }
+   }
+
+   @SubscribeEvent
+   public void onRenderHUD(RenderGameOverlayEvent.Post event) {
+      // 在 HUD 渲染后调用 renderGuidanceHUD 方法
+      if (!event.isCancelable() && event.type == RenderGameOverlayEvent.ElementType.HELMET) {
+         MCH_RenderAircraft.renderGuidanceHUD();  // 这里调用 renderGuidanceHUD
+      }
    }
 
 }

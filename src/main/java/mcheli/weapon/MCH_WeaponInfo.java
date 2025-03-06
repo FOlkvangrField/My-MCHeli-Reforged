@@ -162,8 +162,13 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
     */
    public int passiveRadarLockOutCount = 20;
 
+   /**
+    * 对TV弹启用激光制导
+    */
+   public boolean laserGuidance = true;
 
-   public MCH_WeaponInfo(String name) {
+
+    public MCH_WeaponInfo(String name) {
       this.name = name;
       this.displayName = name;
       this.type = "";

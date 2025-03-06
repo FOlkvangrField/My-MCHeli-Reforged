@@ -59,6 +59,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import org.lwjgl.opengl.Display;
 
 @SideOnly(Side.CLIENT)
@@ -99,7 +100,7 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
    private static double mouseRollDeltaY = 0.0D;
    private static boolean isRideAircraft = false;
    private static float prevTick = 0.0F;
-   public static double smoothing;
+
 
 
    public MCH_ClientCommonTickHandler(Minecraft minecraft, MCH_Config config) {
@@ -610,17 +611,6 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
          return true;
       } else {
          return false;
-      }
-   }
-
-   @SubscribeEvent
-   public void renderTick(TickEvent.RenderTickEvent event) {
-      switch (event.phase) {
-         case START:
-            smoothing = event.renderTickTime;
-            break;
-         case END:
-            break;
       }
    }
 

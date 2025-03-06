@@ -1,9 +1,8 @@
 package mcheli.weapon;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
 
-public abstract class MCH_GuidanceSystem {
+public abstract class MCH_EntityGuidanceSystem implements MCH_IGuidanceSystem {
 
     public int lockCount;
     public int lockSoundCount;
@@ -71,8 +70,6 @@ public abstract class MCH_GuidanceSystem {
     protected abstract int getLockCount();
 
     protected abstract int getLockCountMax();
-
-    protected abstract void update();
 
     protected abstract Entity getLastLockEntity();
 }
