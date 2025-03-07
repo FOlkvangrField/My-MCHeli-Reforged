@@ -38,10 +38,13 @@ public class MCH_WeaponTvMissile extends MCH_WeaponBase {
       this.lastShotTvMissile = null;
       this.isTVGuided = false;
 
-      this.guidanceSystem = new MCH_LaserGuidanceSystem();
-      guidanceSystem.worldObj = w;
-      if(w.isRemote) {
-         guidanceSystem.user = Minecraft.getMinecraft().thePlayer;
+      if (getInfo().laserGuidance) {
+         this.guidanceSystem = new MCH_LaserGuidanceSystem();
+         guidanceSystem.worldObj = w;
+         guidanceSystem.hasLaserGuidancePod = wi.hasLaserGuidancePod;
+         if (w.isRemote) {
+            guidanceSystem.user = Minecraft.getMinecraft().thePlayer;
+         }
       }
    }
 
@@ -65,7 +68,9 @@ public class MCH_WeaponTvMissile extends MCH_WeaponBase {
 
    public void update(int countWait) {
       super.update(countWait);
-      this.guidanceSystem.update();
+      if(guidanceSystem != null) {
+         this.guidanceSystem.update();
+      }
       if(!super.worldObj.isRemote) {
          if(this.isTVGuided && super.tick <= 9) {
             if(super.tick % 3 == 0 && this.lastShotTvMissile != null && !this.lastShotTvMissile.isDead && this.lastShotEntity != null && !this.lastShotEntity.isDead) {

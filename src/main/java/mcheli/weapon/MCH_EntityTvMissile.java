@@ -1,6 +1,8 @@
 package mcheli.weapon;
 
 import mcheli.aircraft.MCH_EntityAircraft;
+import mcheli.aircraft.MCH_EntitySeat;
+import mcheli.uav.MCH_EntityUavStation;
 import mcheli.wrapper.W_WorldFunc;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -79,8 +81,25 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
         //激光制导
         else {
 
-            float yaw = e.rotationYaw;  // 获取玩家的偏航角度
-            float pitch = e.rotationPitch;  // 获取玩家的俯仰角度
+            float yaw;
+            float pitch;
+
+            if (getInfo().hasLaserGuidancePod) {
+                yaw = e.rotationYaw;  // 获取玩家的偏航角度
+                pitch = e.rotationPitch;  // 获取玩家的俯仰角度
+            } else {
+//                MCH_EntityAircraft ac = null; //玩家乘坐的实体
+//                if(e.ridingEntity instanceof MCH_EntityAircraft) {
+//                    ac = (MCH_EntityAircraft)e.ridingEntity;
+//                } else if(e.ridingEntity instanceof MCH_EntitySeat) {
+//                    ac = ((MCH_EntitySeat)e.ridingEntity).getParent();
+//                } else if(e.ridingEntity instanceof MCH_EntityUavStation) {
+//                    ac = ((MCH_EntityUavStation)e.ridingEntity).getControlAircract();
+//                }
+//                if(ac == null) return;
+                yaw = shootingAircraft.rotationYaw;
+                pitch = shootingAircraft.rotationPitch;
+            }
 
             // 计算目标方向的三维坐标变化量
             double targetX = -MathHelper.sin(yaw / 180.0F * (float) Math.PI) * MathHelper.cos(pitch / 180.0F * (float) Math.PI);

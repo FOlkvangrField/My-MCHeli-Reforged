@@ -1,5 +1,10 @@
 package mcheli.weapon;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import mcheli.aircraft.MCH_EntityAircraft;
+import mcheli.aircraft.MCH_EntitySeat;
+import mcheli.uav.MCH_EntityUavStation;
 import mcheli.wrapper.W_WorldFunc;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
@@ -19,6 +24,10 @@ public class MCH_LaserGuidanceSystem implements MCH_IGuidanceSystem {
     public double targetPosX;
     public double targetPosY;
     public double targetPosZ;
+
+    @SideOnly(Side.CLIENT)
+    public MCH_EntityLockBox lockBox;
+    public boolean hasLaserGuidancePod = true;
 
     @Override
     public double getLockPosX() {
@@ -40,8 +49,25 @@ public class MCH_LaserGuidanceSystem implements MCH_IGuidanceSystem {
 
         if(worldObj.isRemote) {
 
-            float yaw = user.rotationYaw;  // 获取玩家的偏航角度
-            float pitch = user.rotationPitch;  // 获取玩家的俯仰角度
+            float yaw;
+            float pitch;
+
+            if (hasLaserGuidancePod) {
+                yaw = user.rotationYaw;  // 获取玩家的偏航角度
+                pitch = user.rotationPitch;  // 获取玩家的俯仰角度
+            } else {
+                MCH_EntityAircraft ac = null; //玩家乘坐的实体
+                if(user.ridingEntity instanceof MCH_EntityAircraft) {
+                    ac = (MCH_EntityAircraft)user.ridingEntity;
+                } else if(user.ridingEntity instanceof MCH_EntitySeat) {
+                    ac = ((MCH_EntitySeat)user.ridingEntity).getParent();
+                } else if(user.ridingEntity instanceof MCH_EntityUavStation) {
+                    ac = ((MCH_EntityUavStation)user.ridingEntity).getControlAircract();
+                }
+                if(ac == null) return;
+                yaw = ac.rotationYaw;
+                pitch = ac.rotationPitch;
+            }
 
             // 计算目标方向的三维坐标变化量
             double targetX = -MathHelper.sin(yaw / 180.0F * (float) Math.PI) * MathHelper.cos(pitch / 180.0F * (float) Math.PI);
@@ -93,6 +119,13 @@ public class MCH_LaserGuidanceSystem implements MCH_IGuidanceSystem {
             targetPosX = hitResult.hitVec.xCoord;
             targetPosY = hitResult.hitVec.yCoord;
             targetPosZ = hitResult.hitVec.zCoord;
+
+            if(lockBox != null) {
+                lockBox.setPosition(targetPosX, targetPosY, targetPosZ);
+            } else {
+                lockBox = new MCH_EntityLockBox(worldObj);
+                worldObj.spawnEntityInWorld(lockBox);
+            }
         }
     }
 }

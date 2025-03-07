@@ -165,8 +165,12 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
    /**
     * 对TV弹启用激光制导
     */
-   public boolean laserGuidance = true;
+   public boolean laserGuidance = false;
 
+   /**
+    * 是否有激光吊舱
+    */
+   public boolean hasLaserGuidancePod = true;
 
     public MCH_WeaponInfo(String name) {
       this.name = name;
@@ -400,6 +404,12 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
          }
          else if(item.equalsIgnoreCase("PassiveRadarLockOutCount")) {
             this.passiveRadarLockOutCount = this.toInt(data, 0, 200);
+         }
+         else if(item.equalsIgnoreCase("LaserGuidance")) {
+            this.laserGuidance = this.toBool(data);
+         }
+         else if(item.equalsIgnoreCase("HasLaserGuidancePod")) {
+            this.hasLaserGuidancePod = this.toBool(data);
          }
          else if(item.compareTo("reloadtime") == 0) {
             this.reloadTime = this.toInt(data, 3, 1000);

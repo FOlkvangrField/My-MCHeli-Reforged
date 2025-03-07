@@ -62,18 +62,7 @@ import mcheli.vehicle.MCH_EntityVehicle;
 import mcheli.vehicle.MCH_ItemVehicle;
 import mcheli.vehicle.MCH_VehicleInfo;
 import mcheli.vehicle.MCH_VehicleInfoManager;
-import mcheli.weapon.MCH_EntityA10;
-import mcheli.weapon.MCH_EntityAAMissile;
-import mcheli.weapon.MCH_EntityASMissile;
-import mcheli.weapon.MCH_EntityATMissile;
-import mcheli.weapon.MCH_EntityBomb;
-import mcheli.weapon.MCH_EntityBullet;
-import mcheli.weapon.MCH_EntityDispensedItem;
-import mcheli.weapon.MCH_EntityMarkerRocket;
-import mcheli.weapon.MCH_EntityRocket;
-import mcheli.weapon.MCH_EntityTorpedo;
-import mcheli.weapon.MCH_EntityTvMissile;
-import mcheli.weapon.MCH_WeaponInfoManager;
+import mcheli.weapon.*;
 import mcheli.wrapper.NetworkMod;
 import mcheli.wrapper.W_Item;
 import mcheli.wrapper.W_ItemList;
@@ -312,6 +301,7 @@ public class MCH_MOD {
       EntityRegistry.registerModEntity(MCH_EntityDispensedItem.class, "MCH.E.DispItem", 210, this, 530, 5, true);
       EntityRegistry.registerModEntity(MCH_EntityFlare.class, "MCH.E.Flare", 300, this, 330, 10, true);
       EntityRegistry.registerModEntity(MCH_EntityThrowable.class, "MCH.E.Throwable", 400, this, 330, 10, true);
+      EntityRegistry.registerModEntity(MCH_EntityLockBox.class, "MCH.E.LockBox", 401, this, 32, 20, false);
    }
 
    @EventHandler

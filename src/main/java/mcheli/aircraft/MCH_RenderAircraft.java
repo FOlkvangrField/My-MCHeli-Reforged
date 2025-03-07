@@ -1028,7 +1028,7 @@ public abstract class MCH_RenderAircraft extends W_Render {
    }
 
    public static void renderLandingGear(MCH_EntityAircraft ac, MCH_AircraftInfo info, float tickTime) {
-      if(info.haveLandingGear() && ac.partLandingGear != null) {
+      if (info.haveLandingGear() && ac.partLandingGear != null) {
          float rot = ac.getLandingGearRotation();
          float prevRot = ac.getPrevLandingGearRotation();
          float revR = 90.0F - rot;
@@ -1036,42 +1036,42 @@ public abstract class MCH_RenderAircraft extends W_Render {
          float rot1 = prevRot + (rot - prevRot) * tickTime;
          float rot1Rev = revPr + (revR - revPr) * tickTime;
          float rotHatch = 90.0F * MathHelper.sin(rot1 * 2.0F * 3.1415927F / 180.0F) * 3.0F;
-         if(rotHatch > 90.0F) {
+         if (rotHatch > 90.0F) {
             rotHatch = 90.0F;
          }
 
          Iterator i$ = info.landingGear.iterator();
 
-         while(i$.hasNext()) {
-            MCH_AircraftInfo.LandingGear n = (MCH_AircraftInfo.LandingGear)i$.next();
+         while (i$.hasNext()) {
+            MCH_AircraftInfo.LandingGear n = (MCH_AircraftInfo.LandingGear) i$.next();
             GL11.glPushMatrix();
             GL11.glTranslated(n.pos.xCoord, n.pos.yCoord, n.pos.zCoord);
-            if(!n.reverse) {
-               if(!n.hatch) {
-                  GL11.glRotatef(rot1 * n.maxRotFactor, (float)n.rot.xCoord, (float)n.rot.yCoord, (float)n.rot.zCoord);
+            if (!n.reverse) {
+               if (!n.hatch) {
+                  GL11.glRotatef(rot1 * n.maxRotFactor, (float) n.rot.xCoord, (float) n.rot.yCoord, (float) n.rot.zCoord);
                } else {
-                  GL11.glRotatef(rotHatch * n.maxRotFactor, (float)n.rot.xCoord, (float)n.rot.yCoord, (float)n.rot.zCoord);
+                  GL11.glRotatef(rotHatch * n.maxRotFactor, (float) n.rot.xCoord, (float) n.rot.yCoord, (float) n.rot.zCoord);
                }
             } else {
-               GL11.glRotatef(rot1Rev * n.maxRotFactor, (float)n.rot.xCoord, (float)n.rot.yCoord, (float)n.rot.zCoord);
+               GL11.glRotatef(rot1Rev * n.maxRotFactor, (float) n.rot.xCoord, (float) n.rot.yCoord, (float) n.rot.zCoord);
             }
 
-            if(n.enableRot2) {
-               if(!n.reverse) {
-                  GL11.glRotatef(rot1 * n.maxRotFactor2, (float)n.rot2.xCoord, (float)n.rot2.yCoord, (float)n.rot2.zCoord);
+            if (n.enableRot2) {
+               if (!n.reverse) {
+                  GL11.glRotatef(rot1 * n.maxRotFactor2, (float) n.rot2.xCoord, (float) n.rot2.yCoord, (float) n.rot2.zCoord);
                } else {
-                  GL11.glRotatef(rot1Rev * n.maxRotFactor2, (float)n.rot2.xCoord, (float)n.rot2.yCoord, (float)n.rot2.zCoord);
+                  GL11.glRotatef(rot1Rev * n.maxRotFactor2, (float) n.rot2.xCoord, (float) n.rot2.yCoord, (float) n.rot2.zCoord);
                }
             }
 
             GL11.glTranslated(-n.pos.xCoord, -n.pos.yCoord, -n.pos.zCoord);
-            if(n.slide != null) {
+            if (n.slide != null) {
                float f = rot / 90.0F;
-               if(n.reverse) {
+               if (n.reverse) {
                   f = 1.0F - f;
                }
 
-               GL11.glTranslated((double)f * n.slide.xCoord, (double)f * n.slide.yCoord, (double)f * n.slide.zCoord);
+               GL11.glTranslated((double) f * n.slide.xCoord, (double) f * n.slide.yCoord, (double) f * n.slide.zCoord);
             }
 
             renderPart(n.model, info.model, n.modelName);
@@ -1079,93 +1079,6 @@ public abstract class MCH_RenderAircraft extends W_Render {
          }
       }
 
-   }
-
-   public static void renderGuidanceHUD() {
-      EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
-      if(player == null) return;
-      MCH_EntityAircraft ac = null; //玩家乘坐的实体
-      if(player.ridingEntity instanceof MCH_EntityAircraft) {
-         ac = (MCH_EntityAircraft)player.ridingEntity;
-      } else if(player.ridingEntity instanceof MCH_EntitySeat) {
-         ac = ((MCH_EntitySeat)player.ridingEntity).getParent();
-      } else if(player.ridingEntity instanceof MCH_EntityUavStation) {
-         ac = ((MCH_EntityUavStation)player.ridingEntity).getControlAircract();
-      }
-      if(ac == null) return;
-      MCH_IGuidanceSystem guidanceSystem = ac.getCurrentWeapon(player).getCurrentWeapon().getGuidanceSystem();
-      if(guidanceSystem == null) {
-         return;
-      }
-
-      if (guidanceSystem instanceof MCH_LaserGuidanceSystem) {
-         double lockPosX = guidanceSystem.getLockPosX();
-         double lockPosY = guidanceSystem.getLockPosY();
-         double lockPosZ = guidanceSystem.getLockPosZ();
-
-         System.out.println((int)lockPosX + " " + (int)lockPosY + " " + (int)lockPosZ);
-
-         RenderManager rm = RenderManager.instance;
-         double distance = Math.sqrt(Math.pow(lockPosX - RenderManager.renderPosX, 2) + Math.pow(lockPosY - RenderManager.renderPosY, 2) + Math.pow(lockPosZ - RenderManager.renderPosZ, 2));
-
-         double x = lockPosX - RenderManager.renderPosX;
-         double y = lockPosY - RenderManager.renderPosY;
-         double z = lockPosZ - RenderManager.renderPosZ;
-
-         if(distance > 1000) return;
-
-         GL11.glPushMatrix();
-         // 进行位置变换，将目标实体渲染到玩家视角中
-         GL11.glTranslatef((float)x, (float)y , (float)z);
-         GL11.glNormal3f(0.0F, 1.0F, 0.0F);
-         GL11.glRotatef(-rm.playerViewY, 0.0F, 1.0F, 0.0F);
-         GL11.glRotatef(rm.playerViewX, 1.0F, 0.0F, 0.0F);
-         GL11.glScalef(-0.02666667F, -0.02666667F, 0.02666667F);
-         GL11.glDisable(2896); // 禁用深度测试
-         GL11.glTranslatef(0.0F, 9.374999F, 0.0F); // 上移一些偏移量
-         GL11.glDepthMask(false); // 禁用深度写入
-         GL11.glEnable(3042); // 启用混合
-         GL11.glBlendFunc(770, 771); // 设置混合模式
-         GL11.glDisable(3553); // 禁用纹理
-         GL11.glDisable(2929 /* GL_DEPTH_TEST */);
-
-         // 获取绘制前的屏幕宽度
-         int prevWidth = GL11.glGetInteger(2849);
-         // 设置目标实体大小 50-20, 1000-100
-         float minDistance = 50.0F;
-         float size1 = 20.0F;
-         float maxDistance = 1000.0F;
-         float maxSize = 100.0F;
-         float size = size1 + (float)((distance - minDistance) / (maxDistance - minDistance)) * (maxSize - size1);
-         // 确保 size 在 20 到 100 之间
-         size = Math.max(size1, Math.min(maxSize, size));
-
-
-         // 创建Tessellator对象，用于绘制图形
-         Tessellator tessellator = Tessellator.instance;
-         tessellator.startDrawing(2); // 开始绘制线条
-         tessellator.setBrightness(240); // 设置亮度
-
-         GL11.glLineWidth((float)MCH_Gui.scaleFactor * 1.5F); // 设置线宽
-         tessellator.setColorRGBA_F(0.0F, 1.0F, 0.0F, 1.0F); // 绿色
-
-         // 绘制矩形框，表示锁定范围
-         tessellator.addVertex(-size - 1.0F, 0.0D, 0.0D);
-         tessellator.addVertex(-size - 1.0F, size * 2.0F, 0.0D);
-         tessellator.addVertex(size + 1.0F, size * 2.0F, 0.0D);
-         tessellator.addVertex(size + 1.0F, 0.0D, 0.0D);
-         tessellator.draw(); // 绘制线条
-
-         GL11.glPopMatrix();
-         // 恢复之前的线宽，启用纹理，恢复深度写入和深度测试
-         GL11.glLineWidth((float) prevWidth);
-         GL11.glEnable(3553);
-         GL11.glDepthMask(true);
-         GL11.glEnable(2896);
-         GL11.glDisable(3042);
-         GL11.glEnable(2929 /* GL_DEPTH_TEST */);
-         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F); // 恢复默认颜色
-      }
    }
 
    public static void renderEntityMarker(Entity entity) {

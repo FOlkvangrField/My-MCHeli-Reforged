@@ -187,10 +187,6 @@ public class MCH_ClientEventHook extends W_ClientEventHook {
 
    @SubscribeEvent
    public void onRenderHUD(RenderGameOverlayEvent.Post event) {
-      // 在 HUD 渲染后调用 renderGuidanceHUD 方法
-      if (!event.isCancelable() && event.type == RenderGameOverlayEvent.ElementType.HELMET) {
-         MCH_RenderAircraft.renderGuidanceHUD();  // 这里调用 renderGuidanceHUD
-      }
    }
 
 }
