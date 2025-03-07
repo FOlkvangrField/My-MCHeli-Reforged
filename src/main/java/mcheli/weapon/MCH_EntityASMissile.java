@@ -60,9 +60,9 @@ public class MCH_EntityASMissile extends MCH_EntityBaseBullet {
                double d;
                if((double)this.getGravity() == 0.0D) {
                   var16 = 0.0D;
-                  if(this.getCountOnUpdate() < 10) {
-                     var16 = 20.0D;
-                  }
+//                  if(this.getCountOnUpdate() < 10) {
+//                     var16 = 20.0D;
+//                  }
 
                   y = this.targetPosX - super.posX;
                   z = this.targetPosY + var16 - super.posY;

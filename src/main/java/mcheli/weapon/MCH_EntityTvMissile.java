@@ -81,6 +81,14 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
         //激光制导
         else {
 
+            MCH_EntityAircraft ac = MCH_EntityAircraft.getAircraft_RiddenOrControl(e);
+            if(ac != null && ac.getCurrentWeapon(e).getCurrentWeapon() instanceof MCH_WeaponTvMissile) {
+                MCH_WeaponTvMissile weaponTvMissile = (MCH_WeaponTvMissile) ac.getCurrentWeapon(e).getCurrentWeapon();
+                if(weaponTvMissile.guidanceSystem != null && !weaponTvMissile.guidanceSystem.targeting) {
+                    return;
+                }
+            }
+
             float yaw;
             float pitch;
 
@@ -192,7 +200,7 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
                 super.motionZ = deltaZ * super.acceleration / distance;
 
                 // 限制速度上限，防止导弹速度过快
-                double maxSpeed = 1.5; // 最大速度值
+                double maxSpeed = getInfo().acceleration; // 最大速度值
                 double currentSpeed = Math.sqrt(motionX * motionX + motionY * motionY + motionZ * motionZ);
                 if (currentSpeed > maxSpeed) {
                     double scale = maxSpeed / currentSpeed;

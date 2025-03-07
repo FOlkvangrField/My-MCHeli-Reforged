@@ -80,6 +80,7 @@ public class MCH_EntityATMissile extends MCH_EntityBaseBullet {
 
    }
 
+
    public MCH_BulletModel getDefaultBulletModel() {
       return MCH_DefaultBulletModels.ATMissile;
    }

@@ -171,6 +171,14 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
     * 是否有激光吊舱
     */
    public boolean hasLaserGuidancePod = true;
+   /**
+    * 主动雷达弹
+    */
+   public boolean activeRadar = false;
+   /**
+    * 允许离轴射击
+    */
+    public boolean enableOffAxis = true;
 
     public MCH_WeaponInfo(String name) {
       this.name = name;
@@ -410,6 +418,12 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
          }
          else if(item.equalsIgnoreCase("HasLaserGuidancePod")) {
             this.hasLaserGuidancePod = this.toBool(data);
+         }
+         else if(item.equalsIgnoreCase("ActiveRadar")) {
+            this.activeRadar = this.toBool(data);
+         }
+         else if(item.equalsIgnoreCase("EnableOffAxis")) {
+            this.enableOffAxis = this.toBool(data);
          }
          else if(item.compareTo("reloadtime") == 0) {
             this.reloadTime = this.toInt(data, 3, 1000);

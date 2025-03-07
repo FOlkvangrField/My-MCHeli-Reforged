@@ -67,7 +67,7 @@ public class MCH_WeaponATMissile extends MCH_WeaponEntitySeeker {
          double tX = (double) (-MathHelper.sin(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
          double tZ = (double) (MathHelper.cos(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
          double tY = (double) (-MathHelper.sin(pitch / 180.0F * 3.1415927F));
-         MCH_EntityATMissile e = new MCH_EntityATMissile(super.worldObj, prm.posX, prm.posY, prm.posZ, tX, tY, tZ, yaw, pitch, super.acceleration);
+         MCH_EntityATMissile e = new MCH_EntityATMissile(super.worldObj, prm.posX, prm.posY, prm.posZ, tX, tY, tZ, yaw, pitch, (double) super.acceleration);
          e.setName(super.name);
          e.setParameterFromWeapon(this, prm.entity, prm.user);
          e.guidanceType = prm.option2;
@@ -83,7 +83,7 @@ public class MCH_WeaponATMissile extends MCH_WeaponEntitySeeker {
             double tX = (double) (-MathHelper.sin(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
             double tZ = (double) (MathHelper.cos(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
             double tY = (double) (-MathHelper.sin(pitch / 180.0F * 3.1415927F));
-            MCH_EntityATMissile e = new MCH_EntityATMissile(super.worldObj, prm.posX, prm.posY, prm.posZ, tX, tY, tZ, yaw, pitch, super.acceleration);
+            MCH_EntityATMissile e = new MCH_EntityATMissile(super.worldObj, prm.posX, prm.posY, prm.posZ, tX, tY, tZ, yaw, pitch, (double) super.acceleration);
             e.setName(super.name);
             e.setParameterFromWeapon(this, prm.entity, prm.user);
             e.setTargetEntity(tgtEnt);

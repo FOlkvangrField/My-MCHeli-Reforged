@@ -23,8 +23,5 @@ public class MCH_EntityLockBox extends W_Entity {
 
     @Override
     public void onUpdate() {
-        if(worldObj.isRemote) {
-            System.out.println((int) posX + " " + (int) posY + " " + (int) posZ);
-        }
     }
 }

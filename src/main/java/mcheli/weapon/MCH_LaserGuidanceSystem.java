@@ -24,7 +24,7 @@ public class MCH_LaserGuidanceSystem implements MCH_IGuidanceSystem {
     public double targetPosX;
     public double targetPosY;
     public double targetPosZ;
-
+    public boolean targeting = false;
     @SideOnly(Side.CLIENT)
     public MCH_EntityLockBox lockBox;
     public boolean hasLaserGuidancePod = true;
@@ -48,6 +48,8 @@ public class MCH_LaserGuidanceSystem implements MCH_IGuidanceSystem {
     public void update() {
 
         if(worldObj.isRemote) {
+
+            if(!targeting) return;
 
             float yaw;
             float pitch;

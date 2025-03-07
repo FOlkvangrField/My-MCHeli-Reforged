@@ -39,6 +39,9 @@ public class MCH_RenderLockBox extends W_Render {
         }
 
         if (guidanceSystem instanceof MCH_LaserGuidanceSystem) {
+
+            if(!((MCH_LaserGuidanceSystem) guidanceSystem).targeting) return;
+
             double lockPosX = guidanceSystem.getLockPosX();
             double lockPosY = guidanceSystem.getLockPosY();
             double lockPosZ = guidanceSystem.getLockPosZ();

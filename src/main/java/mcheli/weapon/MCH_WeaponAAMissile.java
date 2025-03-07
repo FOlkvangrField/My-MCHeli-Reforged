@@ -38,10 +38,17 @@ public class MCH_WeaponAAMissile extends MCH_WeaponEntitySeeker {
    public boolean shot(MCH_WeaponParam prm) {
       boolean result = false;
       if(!super.worldObj.isRemote) {
-         if(getInfo().passiveRadar) {
+         if(getInfo().passiveRadar || getInfo().activeRadar) {
             this.playSound(prm.entity);
-            float yaw = prm.entity.rotationYaw + super.fixRotationYaw;
-            float pitch = prm.entity.rotationPitch + super.fixRotationPitch;
+
+            float yaw, pitch;
+            if(getInfo().enableOffAxis) {
+               yaw = prm.user.rotationYaw + super.fixRotationYaw;
+               pitch = prm.user.rotationPitch + super.fixRotationPitch;
+            } else {
+               yaw = prm.entity.rotationYaw + super.fixRotationYaw;
+               pitch = prm.entity.rotationPitch + super.fixRotationPitch;
+            }
             double tX = -MathHelper.sin(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F);
             double tZ = MathHelper.cos(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F);
             double tY = -MathHelper.sin(pitch / 180.0F * 3.1415927F);
@@ -59,8 +66,14 @@ public class MCH_WeaponAAMissile extends MCH_WeaponEntitySeeker {
             Entity tgtEnt = prm.user.worldObj.getEntityByID(prm.option1);
             if (tgtEnt != null && !tgtEnt.isDead) {
                this.playSound(prm.entity);
-               float yaw = prm.entity.rotationYaw + super.fixRotationYaw;
-               float pitch = prm.entity.rotationPitch + super.fixRotationPitch;
+               float yaw, pitch;
+               if(getInfo().enableOffAxis) {
+                  yaw = prm.user.rotationYaw + super.fixRotationYaw;
+                  pitch = prm.user.rotationPitch + super.fixRotationPitch;
+               } else {
+                  yaw = prm.entity.rotationYaw + super.fixRotationYaw;
+                  pitch = prm.entity.rotationPitch + super.fixRotationPitch;
+               }
                double tX = (double) (-MathHelper.sin(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
                double tZ = (double) (MathHelper.cos(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pitch / 180.0F * 3.1415927F));
                double tY = (double) (-MathHelper.sin(pitch / 180.0F * 3.1415927F));
