@@ -6,7 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 public class MCH_HBMUtil {
-    private static Class<?> nukeExplosionClass;
+    private static Class<?> nukeExplosionMK5Class;
     private static Class<?> nukeTorexClass;
     private static Class<?> explosionChaosClass;
     private static Class<?> explosionCreatorClass;
@@ -14,7 +14,7 @@ public class MCH_HBMUtil {
 
     static {
         try {
-            nukeExplosionClass = Class.forName("com.hbm.entity.logic.EntityNukeExplosionMK5");
+            nukeExplosionMK5Class = Class.forName("com.hbm.entity.logic.EntityNukeExplosionMK5");
             nukeTorexClass = Class.forName("com.hbm.entity.effect.EntityNukeTorex");
             explosionChaosClass = Class.forName("com.hbm.explosion.ExplosionChaos");
             explosionCreatorClass = Class.forName("com.hbm.particle.helper.ExplosionCreator");
@@ -24,10 +24,10 @@ public class MCH_HBMUtil {
         }
     }
 
-    public static void EntityNukeExplosionMK5_statFac(World world, double nukeYield, double posX, double posY, double posZ) {
+    public static void EntityNukeExplosionMK5_statFac(World world, float nukeYield, double posX, double posY, double posZ) {
         try {
-            if (nukeExplosionClass != null) {
-                Method statFacMethod = nukeExplosionClass.getMethod("statFac", World.class, double.class, double.class, double.class, double.class);
+            if (nukeExplosionMK5Class != null) {
+                Method statFacMethod = nukeExplosionMK5Class.getMethod("statFac", World.class, float.class, double.class, double.class, double.class);
                 statFacMethod.invoke(null, world, nukeYield, posX, posY, posZ);
             }
         } catch (Exception e) {
