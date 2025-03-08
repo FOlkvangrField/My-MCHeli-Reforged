@@ -21,6 +21,7 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
    public String explosionType;
    public int nukeYield;
    public int chemYield=0;
+   public boolean nukeEffectOnly;
    public String displayName;
    public String type;
    public int power;
@@ -376,6 +377,8 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
             this.nukeYield = this.toInt(data, 0, 100000);
          } else if(item.equalsIgnoreCase("chemYield")) {
             this.chemYield = this.toInt(data, 0, 100000);
+         } else if(item.equalsIgnoreCase("NukeEffectOnly")) {
+            this.nukeEffectOnly = this.toBool(data);
          } else if(item.equalsIgnoreCase("MaxDegreeOfMissile")) {
             this.maxDegreeOfMissile = this.toInt(data, 0, 100000);
          } else if(item.equalsIgnoreCase("TickEndHoming")) {
