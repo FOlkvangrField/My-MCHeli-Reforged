@@ -8,6 +8,7 @@ import mcheli.weapon.MCH_WeaponBase;
 import mcheli.weapon.MCH_WeaponInfo;
 import mcheli.weapon.MCH_WeaponParam;
 import mcheli.wrapper.W_McClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
@@ -195,10 +196,8 @@ public class MCH_WeaponSet {
    }
 
    public void onSwitchWeapon(boolean isRemote, boolean isCreative) {
-      int cntSwitch = 15;
-      if(isRemote) {
-         cntSwitch += 10;
-      }
+
+      int cntSwitch = getCurrentWeapon().getInfo().weaponSwitchCount;
 
       if(this.countWait >= -cntSwitch) {
          if(this.countWait > cntSwitch) {
@@ -206,6 +205,10 @@ public class MCH_WeaponSet {
          } else {
             this.countWait = -cntSwitch;
          }
+      }
+
+      if(this.getCurrentWeapon().worldObj.isRemote) {
+         W_McClient.MOD_playSoundFX(getInfo().weaponSwitchSound, 3F, 1.0F);
       }
 
       this.currentWeaponIndex = 0;

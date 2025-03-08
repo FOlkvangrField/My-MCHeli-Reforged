@@ -199,6 +199,16 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
      */
     public int scanInterval = 20;
 
+    /**
+     * 武器切换冷却
+     */
+    public int weaponSwitchCount = 0;
+
+    /**
+     * 武器切换音效
+     */
+    public String weaponSwitchSound = "";
+
     public MCH_WeaponInfo(String name) {
         this.name = name;
         this.displayName = name;
@@ -437,7 +447,15 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
                 this.enableOffAxis = this.toBool(data);
             } else if (item.equalsIgnoreCase("TurningFactor")) {
                 this.turningFactor = this.toDouble(data);
-            } else if (item.compareTo("reloadtime") == 0) {
+            } else if (item.equalsIgnoreCase("ScanInterval")) {
+                this.scanInterval = this.toInt(data);
+            } else if (item.equalsIgnoreCase("WeaponSwitchCount")) {
+                this.weaponSwitchCount = this.toInt(data);
+            } else if (item.equalsIgnoreCase("WeaponSwitchSound")) {
+                this.weaponSwitchSound = data.toLowerCase().trim();
+            }
+
+            else if (item.compareTo("reloadtime") == 0) {
                 this.reloadTime = this.toInt(data, 3, 1000);
             } else if (item.compareTo("round") == 0) {
                 this.round = this.toInt(data, 1, 30000);

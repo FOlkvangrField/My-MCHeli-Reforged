@@ -474,6 +474,11 @@ public class MCH_ClientProxy extends MCH_CommonProxy {
          W_McClient.addSound(info.soundFileName + ".ogg");
       }
 
+      while(i$.hasNext()) {
+         MCH_WeaponInfo info = (MCH_WeaponInfo)i$.next();
+         W_McClient.addSound(info.weaponSwitchSound + ".ogg");
+      }
+
       i$ = MCP_PlaneInfoManager.map.values().iterator();
 
       while(i$.hasNext()) {

@@ -42,7 +42,7 @@ public abstract class MCH_WeaponBase {
    public int tick;
    public int optionParameter1;
    public int optionParameter2;
-   private int currentMode;
+    private int currentMode;
    public boolean canPlaySound;
    public List<MCH_EntityBaseBullet> shootBullets = new ArrayList<>();
 
@@ -228,7 +228,6 @@ public abstract class MCH_WeaponBase {
       if(e.worldObj.isRemote && this.getInfo() != null) {
          W_McClient.MOD_playSoundFX(this.getInfo().soundFileName, volume, pitch);
       }
-
    }
 
    public double getLandInDistance(MCH_WeaponParam prm) {
