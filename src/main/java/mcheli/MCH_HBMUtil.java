@@ -1,5 +1,6 @@
 package mcheli;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 
 import java.lang.reflect.Constructor;
@@ -24,15 +25,16 @@ public class MCH_HBMUtil {
         }
     }
 
-    public static void EntityNukeExplosionMK5_statFac(World world, float nukeYield, double posX, double posY, double posZ) {
+    public static Object EntityNukeExplosionMK5_statFac(World world, int r, double posX, double posY, double posZ) {
         try {
             if (nukeExplosionMK5Class != null) {
-                Method statFacMethod = nukeExplosionMK5Class.getMethod("statFac", World.class, float.class, double.class, double.class, double.class);
-                statFacMethod.invoke(null, world, nukeYield, posX, posY, posZ);
+                Method statFacMethod = nukeExplosionMK5Class.getMethod("statFac", World.class, int.class, double.class, double.class, double.class);
+                return statFacMethod.invoke(null, world, r, posX, posY, posZ);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     public static void EntityNukeTorex_statFac(World world, double posX, double posY, double posZ, float nukeYield) {
