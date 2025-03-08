@@ -1,8 +1,10 @@
 package mcheli.weapon;
 
+import mcheli.MCH_Lib;
 import mcheli.aircraft.MCH_EntityAircraft;
 import mcheli.aircraft.MCH_EntitySeat;
 import mcheli.uav.MCH_EntityUavStation;
+import mcheli.vector.Vector3f;
 import mcheli.wrapper.W_WorldFunc;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -25,7 +27,6 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
     public double targetPosX;
     public double targetPosY;
     public double targetPosZ;
-
 
     public MCH_EntityTvMissile(World par1World) {
         super(par1World);
@@ -167,7 +168,6 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
         }
     }
 
-
     public void onLaserGuide() {
 
         // 获取当前导弹目标位置的方块
@@ -194,10 +194,13 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
                 // 计算导弹到目标的距离
                 distance = MathHelper.sqrt_double(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
 
+                double targetMotionX = deltaX * super.acceleration / distance;
+                double targetMotionY = deltaY * super.acceleration / distance;
+                double targetMotionZ = deltaZ * super.acceleration / distance;
                 // 计算导弹的速度分量
-                super.motionX = deltaX * super.acceleration / distance;
-                super.motionY = deltaY * super.acceleration / distance;
-                super.motionZ = deltaZ * super.acceleration / distance;
+                super.motionX += (targetMotionX - super.motionX) * getInfo().turningFactor;
+                super.motionY += (targetMotionY - super.motionY) * getInfo().turningFactor;
+                super.motionZ += (targetMotionZ - super.motionZ) * getInfo().turningFactor;
 
                 // 限制速度上限，防止导弹速度过快
                 double maxSpeed = getInfo().acceleration; // 最大速度值
@@ -235,6 +238,7 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
     }
 
 
+
     public void sprinkleBomblet() {
         if (!super.worldObj.isRemote) {
             MCH_EntityRocket e = new MCH_EntityRocket(super.worldObj, super.posX, super.posY, super.posZ, super.motionX, super.motionY, super.motionZ, super.rotationYaw, super.rotationPitch, super.acceleration);
@@ -254,4 +258,6 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
     public MCH_BulletModel getDefaultBulletModel() {
         return MCH_DefaultBulletModels.ATMissile;
     }
+
+
 }

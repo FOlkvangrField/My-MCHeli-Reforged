@@ -3,6 +3,8 @@ package mcheli.weapon;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,7 +36,9 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeChunkManager;
 
 public abstract class MCH_EntityBaseBullet extends W_Entity {
 
@@ -66,7 +70,10 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
     public double prevMotionY;
     public double prevMotionZ;
     public int antiFlareTick;
+    boolean doingTopAttack = false;
 
+    private ForgeChunkManager.Ticket chunkLoaderTicket;
+    private List<ChunkCoordIntPair> loadedChunks = new ArrayList<>();
 
     public MCH_EntityBaseBullet(World par1World) {
         super(par1World);
@@ -114,6 +121,88 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
         this.acceleration = acceleration;
     }
 
+    public void init(ForgeChunkManager.Ticket ticket) {
+        if (!worldObj.isRemote) {
+            if (ticket != null) {
+                if (chunkLoaderTicket == null) {
+                    chunkLoaderTicket = ticket;
+                    chunkLoaderTicket.bindEntity(this);
+                    chunkLoaderTicket.getModData();
+                }
+                ForgeChunkManager.forceChunk(chunkLoaderTicket, new ChunkCoordIntPair(chunkCoordX, chunkCoordZ));
+            }
+        }
+    }
+
+    public void checkAndLoadChunks() {
+        int currentChunkX = MathHelper.floor_double(posX) >> 4;
+        int currentChunkZ = MathHelper.floor_double(posZ) >> 4;
+        loadChunksInBulletPath(currentChunkX, currentChunkZ, motionX, motionZ);
+    }
+
+    public void loadNeighboringChunks(int chunkX, int chunkZ) {
+        if (!worldObj.isRemote && chunkLoaderTicket != null) {
+            for (ChunkCoordIntPair chunk : loadedChunks) {
+                ForgeChunkManager.unforceChunk(chunkLoaderTicket, chunk);
+            }
+
+            loadedChunks.clear();
+            ChunkCoordIntPair[] neighboringChunks = {
+                    new ChunkCoordIntPair(chunkX, chunkZ),           // Current chunk
+                    new ChunkCoordIntPair(chunkX + 1, chunkZ),       // +X
+                    new ChunkCoordIntPair(chunkX - 1, chunkZ),       // -X
+                    new ChunkCoordIntPair(chunkX, chunkZ + 1),       // +Z
+                    new ChunkCoordIntPair(chunkX, chunkZ - 1),       // -Z
+                    new ChunkCoordIntPair(chunkX + 1, chunkZ + 1),   // +X, +Z
+                    new ChunkCoordIntPair(chunkX - 1, chunkZ - 1),   // -X, -Z
+                    new ChunkCoordIntPair(chunkX + 1, chunkZ - 1),   // +X, -Z
+                    new ChunkCoordIntPair(chunkX - 1, chunkZ + 1)    // -X, +Z
+            };
+            for (ChunkCoordIntPair chunk : neighboringChunks) {
+                loadedChunks.add(chunk);  // add chunk directly without checking
+                ForgeChunkManager.forceChunk(chunkLoaderTicket, chunk);
+            }
+            System.out.println("Loaded surrounding chunks at: " + chunkX + ", " + chunkZ);
+        }
+    }
+
+
+    public void loadChunksInBulletPath(int currentChunkX, int currentChunkZ, double motionX, double motionZ) {
+        if (!worldObj.isRemote && chunkLoaderTicket != null) {
+            // Unload previously loaded chunks to avoid memory bloat
+            for (ChunkCoordIntPair chunk : loadedChunks) {
+                ForgeChunkManager.unforceChunk(chunkLoaderTicket, chunk);
+            }
+            loadedChunks.clear();
+            // Calculate the next chunk in the direction of the bullet's motion
+            int nextChunkX = currentChunkX + (motionX > 0 ? 1 : (motionX < 0 ? -1 : 0));
+            int nextChunkZ = currentChunkZ + (motionZ > 0 ? 1 : (motionZ < 0 ? -1 : 0));
+            // Define the chunks to load (current, next in X, next in Z, and diagonal)
+            ChunkCoordIntPair[] chunksToLoad = {
+                    new ChunkCoordIntPair(currentChunkX, currentChunkZ),      // Current chunk
+                    new ChunkCoordIntPair(nextChunkX, currentChunkZ),         // Next chunk in X direction
+                    new ChunkCoordIntPair(currentChunkX, nextChunkZ),         // Next chunk in Z direction
+                    new ChunkCoordIntPair(nextChunkX, nextChunkZ)             // Diagonal chunk
+            };
+            // Load the chunks ahead of the bullet's path
+            for (ChunkCoordIntPair chunk : chunksToLoad) {
+                if (!loadedChunks.contains(chunk)) {
+                    loadedChunks.add(chunk);
+                    ForgeChunkManager.forceChunk(chunkLoaderTicket, chunk);
+                }
+            }
+            System.out.println("Loaded chunks for bullet at: " + currentChunkX + ", " + currentChunkZ +
+                    " moving to: " + nextChunkX + ", " + nextChunkZ);
+        }
+    }
+
+    private void clearChunkLoaders() {
+        for (ChunkCoordIntPair chunk : loadedChunks) {
+            System.out.println("Clearing chunk loader due to impact.");
+            ForgeChunkManager.unforceChunk(chunkLoaderTicket, chunk);
+        }
+    }
+
     public void setLocationAndAngles(double par1, double par3, double par5, float par7, float par8) {
         super.setLocationAndAngles(par1, par3, par5, par7, par8);
         this.prevPosX2 = par1;
@@ -122,7 +211,6 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
     }
 
     protected void entityInit() {
-        super.entityInit();
         this.getDataWatcher().addObject(27, 0);
         this.getDataWatcher().addObject(29, "");
         this.getDataWatcher().addObject(30, "");
@@ -163,12 +251,14 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
         this.piercing = this.getInfo().piercing;
         if(this instanceof MCH_EntityBullet) {
             if(this.getInfo().acceleration > 4.0F) {
-                this.accelerationFactor = (double)(this.getInfo().acceleration / 4.0F);
+                this.accelerationFactor = this.getInfo().acceleration / 4.0F;
             }
         } else if(this instanceof MCH_EntityRocket && this.isBomblet == 0 && this.getInfo().acceleration > 4.0F) {
-            this.accelerationFactor = (double)(this.getInfo().acceleration / 4.0F);
+            this.accelerationFactor = this.getInfo().acceleration / 4.0F;
         }
-
+        if(getInfo() != null && getInfo().enableChunkLoader) {
+            init(ForgeChunkManager.requestTicket(MCH_MOD.instance, worldObj, ForgeChunkManager.Type.ENTITY));
+        }
     }
 
     public void setDead() {
@@ -363,20 +453,34 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
         double maxAllowedAngle = Math.toRadians(getInfo().maxDegreeOfMissile);  // 可以根据需要调整这个值，10度是一个例子
 
         // 如果角度超过最大允许值，解除锁定
-        if (angle > maxAllowedAngle) {
+        if (angle > maxAllowedAngle && !doingTopAttack) {
             targetEntity = null;
             return;
         }
 
-        if(MCH_WeaponGuidanceSystem.isEntityOnGround(targetEntity, weaponInfo.lockMinHeight)) {
+        //计算目标的速度向量
+        Vector3f targetVelocity = new Vector3f(targetEntity.motionX, targetEntity.motionY, targetEntity.motionZ);
+        double velocityAngle = Math.abs(Vector3f.angle(missileDirection, targetVelocity));
+        if (velocityAngle > getInfo().pdHDNMaxDegree) {
             targetEntity = null;
             return;
         }
+
+        if(this instanceof MCH_EntityAAMissile
+                && MCH_WeaponGuidanceSystem.isEntityOnGround(targetEntity, weaponInfo.lockMinHeight)) {
+            targetEntity = null;
+            return;
+        }
+
+//        // 使用平滑加权平均值来更新当前实体的运动速度
+//        super.motionX = (super.motionX * 6.0D + mx) / 7.0D;  // 更新X轴速度
+//        super.motionY = (super.motionY * 6.0D + my) / 7.0D;  // 更新Y轴速度
+//        super.motionZ = (super.motionZ * 6.0D + mz) / 7.0D;  // 更新Z轴速度
 
         // 使用平滑加权平均值来更新当前实体的运动速度
-        super.motionX = (super.motionX * 6.0D + mx) / 7.0D;  // 更新X轴速度
-        super.motionY = (super.motionY * 6.0D + my) / 7.0D;  // 更新Y轴速度
-        super.motionZ = (super.motionZ * 6.0D + mz) / 7.0D;  // 更新Z轴速度
+        super.motionX = super.motionX + (mx - super.motionX) * getInfo().turningFactor;  // 平滑过渡X轴速度
+        super.motionY = super.motionY + (my - super.motionY) * getInfo().turningFactor;  // 平滑过渡Y轴速度
+        super.motionZ = super.motionZ + (mz - super.motionZ) * getInfo().turningFactor;  // 平滑过渡Z轴速度
 
         // 计算实体朝向目标的旋转角度（Yaw方向）
         double a = (double)((float)Math.atan2(super.motionZ, super.motionX));  // 计算水平方向的角度（Yaw）
@@ -415,6 +519,10 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
     }
 
     public void onUpdate() {
+
+        if(getInfo() != null && getInfo().enableChunkLoader) {
+            checkAndLoadChunks();
+        }
 
         //更新锁定的目标
         if(super.worldObj.isRemote && this.countOnUpdate == 0) {
@@ -818,6 +926,9 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
                     this.newExplosion((double)m.blockX, (double)m.blockY, (double)m.blockZ, i, i, true);
                 }
 
+                if(getInfo() != null && getInfo().enableChunkLoader) {
+                    clearChunkLoaders();
+                }
                 this.setDead();
             }
         } else if (this.getInfo() != null) {

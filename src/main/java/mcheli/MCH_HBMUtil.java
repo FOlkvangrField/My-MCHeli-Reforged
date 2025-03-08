@@ -1,6 +1,5 @@
 package mcheli;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 
 import java.lang.reflect.Constructor;

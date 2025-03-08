@@ -2170,15 +2170,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
    }
 
    public void explosionByCrash(double prevMotionY) {
-      float exp = this.getAcInfo() != null?(float)this.getAcInfo().maxFuel / 400.0F:2.0F;
-      if(exp < 1.0F) {
-         exp = 1.0F;
-      }
-
-      if(exp > 15.0F) {
-         exp = 15.0F;
-      }
-
+      float exp = getAcInfo().explosionSizeByCrash;
       MCH_Lib.DbgLog(super.worldObj, "OnGroundAfterDestroyed:motionY=%.3f", new Object[]{Float.valueOf((float)prevMotionY)});
       MCH_Explosion.newExplosion(super.worldObj, (Entity)null, (Entity)null, super.posX, super.posY, super.posZ, exp, exp >= 2.0F?exp * 0.5F:1.0F, true, true, true, true, 5);
    }

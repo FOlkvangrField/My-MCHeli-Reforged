@@ -151,11 +151,30 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
    private int lastWeaponIndex = -1;
    private MCH_AircraftInfo.PartWeapon lastWeaponPart;
 
+   /**
+    * 雷达种类
+    */
    public EnumRadarType radarType = EnumRadarType.EARLY_AA;
+   /**
+    * 当前载具在现代对空雷达中显示的名字
+    */
    public String nameOnModernAARadar = "?";
+   /**
+    * 当前载具在早期对空雷达中显示的名字
+    */
    public String nameOnEarlyAARadar = "?";
+   /**
+    * 当前载具在现代对地雷达中显示的名字
+    */
    public String nameOnModernASRadar = "?";
+   /**
+    * 当前载具在早期对地雷达中显示的名字
+    */
    public String nameOnEarlyASRadar = "?";
+   /**
+    * 载具被摧毁时爆炸范围
+    */
+   public float explosionSizeByCrash = 5;
 
    public abstract Item getItem();
 
@@ -553,6 +572,8 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
             nameOnModernASRadar = data;
          }else if(item.equalsIgnoreCase("NameOnEarlyASRadar")) {
             nameOnEarlyASRadar = data;
+         } else if(item.equalsIgnoreCase("ExplosionSizeByCrash")) {
+            explosionSizeByCrash = this.toInt(data, 0, 100);
          }
 
          else if(item.compareTo("itemid") == 0) {

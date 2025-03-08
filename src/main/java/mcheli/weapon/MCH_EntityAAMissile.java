@@ -1,7 +1,16 @@
 package mcheli.weapon;
 
+import mcheli.aircraft.MCH_EntityAircraft;
+import mcheli.aircraft.MCH_EntitySeat;
+import mcheli.uav.MCH_EntityUavStation;
+import mcheli.vector.Vector3f;
+import mcheli.wrapper.W_Entity;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
+
+import java.util.List;
 
 public class MCH_EntityAAMissile extends MCH_EntityBaseBullet {
 
@@ -40,11 +49,63 @@ public class MCH_EntityAAMissile extends MCH_EntityBaseBullet {
                }
             }
          } else {
-            //this.setDead();
+            if(getInfo().activeRadar && ticksExisted % getInfo().scanInterval == 0) {
+               scanForTargets();
+            }
          }
       }
 
    }
+
+   private void scanForTargets() {
+      Vector3f missileDirection = new Vector3f((float) super.motionX, (float) super.motionY, (float) super.motionZ);
+      double range = getInfo().maxLockOnRange;
+      List<Entity> list = worldObj.getEntitiesWithinAABB(Entity.class, AxisAlignedBB.getBoundingBox(
+              posX - range, posY - range, posZ - range,
+              posX + range, posY + range, posZ + range
+      ));
+
+      if (list != null && !list.isEmpty()) {
+         double closestAngle = Double.MAX_VALUE;
+         Entity closestTarget = null;
+
+         for (Entity entity : list) {
+            if (entity instanceof MCH_EntityAircraft) {
+
+               if (W_Entity.isEqual(entity, shootingAircraft)) {
+                  continue;
+               }
+
+               boolean isTargetOnGround = MCH_WeaponGuidanceSystem.isEntityOnGround(entity, getInfo().lockMinHeight);
+               if (isTargetOnGround) {
+                  continue;
+               }
+
+               double dx = entity.posX - super.posX;
+               double dy = entity.posY - super.posY;
+               double dz = entity.posZ - super.posZ;
+               Vector3f targetDirection = new Vector3f((float) dx, (float) dy, (float) dz);
+
+               double angle = Math.abs(Vector3f.angle(missileDirection, targetDirection));
+
+               if(angle > Math.toRadians(getInfo().maxLockOnAngle)) {
+                  continue;
+               }
+
+               if (angle < closestAngle) {
+                  closestAngle = angle;
+                  closestTarget = entity;
+               }
+            }
+         }
+
+         if (closestTarget != null) {
+            super.targetEntity = closestTarget;
+            System.out.println("主动弹锁定实体" + ((MCH_EntityAircraft)closestTarget).getAcInfo().name + " 距离" + (int)getDistanceToEntity(closestTarget));
+         }
+      }
+   }
+
 
    public MCH_BulletModel getDefaultBulletModel() {
       return MCH_DefaultBulletModels.AAMissile;
