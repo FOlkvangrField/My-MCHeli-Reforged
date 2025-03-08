@@ -172,11 +172,11 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
     */
    public boolean hasLaserGuidancePod = true;
    /**
-    * 主动雷达弹
+    * 主动雷达弹 TWS模式
     */
    public boolean activeRadar = false;
    /**
-    * 允许离轴射击
+    * 允许离轴射击 AA弹
     */
     public boolean enableOffAxis = true;
 

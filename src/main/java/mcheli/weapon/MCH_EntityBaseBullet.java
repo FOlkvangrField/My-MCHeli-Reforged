@@ -5,11 +5,8 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Iterator;
 import java.util.List;
-import mcheli.MCH_Achievement;
-import mcheli.MCH_Config;
-import mcheli.MCH_Explosion;
-import mcheli.MCH_Lib;
-import mcheli.MCH_MOD;
+
+import mcheli.*;
 import mcheli.aircraft.MCH_EntityAircraft;
 import mcheli.aircraft.MCH_EntityHitBox;
 import mcheli.aircraft.MCH_EntitySeat;
@@ -28,7 +25,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EntityCloudFX;
 import net.minecraft.client.particle.EntityDiggingFX;
 import net.minecraft.client.particle.EntityFX;
-import net.minecraft.client.particle.EntitySmokeFX;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -907,6 +903,24 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
         } else {
             result = MCH_Explosion.newExplosionInWater(super.worldObj, this, this.shootingEntity, x, y, z, exp, expBlock, this.isBomblet == 1?super.rand.nextInt(3) == 0:true, true, this.getInfo().flaming, true, 0, this.getInfo() != null?this.getInfo().damageFactor:null);
         }
+
+        if(this.getInfo().explosionType.equals("hbmNT")){
+            Object explosionNTInstance = MCH_HBMUtil.ExplosionNT_instance_init(super.worldObj, null, this.posX + 0.5, this.posY + 0.5, this.posZ + 0.5, this.explosionPower);
+            if (explosionNTInstance != null) {
+                MCH_HBMUtil.ExplosionNT_instance_overrideResolutionAndExplode(explosionNTInstance, (int) expBlock);
+            }
+            MCH_HBMUtil.ExplosionCreator_composeEffectStandard(worldObj, this.posX + 0.5, this.posY + 1, this.posZ + 0.5);
+        }
+
+        if(this.getInfo().nukeYield > 0) {
+            MCH_HBMUtil.EntityNukeExplosionMK5_statFac(super.worldObj, this.getInfo().nukeYield, this.posX + 0.5, this.posY + 0.5, this.posZ + 0.5);
+            MCH_HBMUtil.EntityNukeTorex_statFac(super.worldObj, this.posX + 0.5, this.posY + 0.5, this.posZ + 0.5, (float) this.getInfo().nukeYield);
+        }
+
+        if(this.getInfo().chemYield > 0) {
+            MCH_HBMUtil.ExplosionChaos_spawnClorine(super.worldObj, posX, posY + 0.5, posZ, this.getInfo().chemYield);
+        }
+
 
         if(result != null && result.hitEntity) {
             this.notifyHitBullet();
