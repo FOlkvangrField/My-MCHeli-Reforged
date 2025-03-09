@@ -12,6 +12,7 @@ import mcheli.aircraft.MCH_BoundingBox;
 import mcheli.aircraft.MCH_MobDropOption;
 import mcheli.aircraft.MCH_SeatInfo;
 import mcheli.aircraft.MCH_SeatRackInfo;
+import mcheli.flare.MCH_Chaff;
 import mcheli.hud.MCH_Hud;
 import mcheli.hud.MCH_HudManager;
 import mcheli.weapon.MCH_WeaponInfoManager;
@@ -41,6 +42,7 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
    public boolean isEnableEjectionSeat;
    public boolean isEnableParachuting;
    public MCH_AircraftInfo.Flare flare;
+   public MCH_AircraftInfo.Chaff chaff;
    public float bodyHeight;
    public float bodyWidth;
    public boolean isFloat;
@@ -175,6 +177,20 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
     * 载具被摧毁时爆炸范围
     */
    public float explosionSizeByCrash = 5;
+   /**
+    * 倒车速度倍率，默认1
+    */
+   public float throttleDownFactor = 1;
+
+   /**
+    * 箔条生效时长
+    */
+   public int chaffUseTime = 100;
+
+   /**
+    * 箔条冷却时长
+    */
+   public int chaffWaitTime = 400;
 
    public abstract Item getItem();
 
@@ -574,6 +590,8 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
             nameOnEarlyASRadar = data;
          } else if(item.equalsIgnoreCase("ExplosionSizeByCrash")) {
             explosionSizeByCrash = this.toInt(data, 0, 100);
+         } else if(item.equalsIgnoreCase("ThrottleDownFactor")) {
+            throttleDownFactor = this.toFloat(data, 0, 10);
          }
 
          else if(item.compareTo("itemid") == 0) {
@@ -830,7 +848,14 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
                                              if(s.length >= 3) {
                                                 this.flare.pos = this.toVec3(s[0], s[1], s[2]);
                                              }
-                                          } else if(item.equalsIgnoreCase("Sound")) {
+                                          } else if(item.equalsIgnoreCase("HasChaff")) {
+                                             chaff = new MCH_AircraftInfo.Chaff();
+                                          } else if(item.equalsIgnoreCase("ChaffUseTime")) {
+                                             chaffUseTime = this.toInt(data, 0, 10000);
+                                          } else if(item.equalsIgnoreCase("ChaffWaitTime")) {
+                                             chaffWaitTime = this.toInt(data, 0, 10000);
+                                          }
+                                          else if(item.equalsIgnoreCase("Sound")) {
                                              this.soundMove = data.toLowerCase();
                                           } else if(item.equalsIgnoreCase("SoundRange")) {
                                              this.soundRange = this.toFloat(data, 1.0F, 1000.0F);
@@ -1321,6 +1346,10 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
       return true;
    }
 
+   public boolean haveChaff() {
+      return this.chaff != null;
+   }
+
    public class RotPart extends MCH_AircraftInfo.DrawnPart {
 
       public final float rotSpeed;
@@ -1613,6 +1642,12 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
       public int[] types = new int[0];
       public Vec3 pos = Vec3.createVectorHelper(0.0D, 0.0D, 0.0D);
 
+
+   }
+
+   public class Chaff {
+
+      public Vec3 pos = Vec3.createVectorHelper(0.0D, 0.0D, 0.0D);
 
    }
 

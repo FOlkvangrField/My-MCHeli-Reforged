@@ -171,7 +171,7 @@ public class MCH_ConfigGui extends W_GuiContainer {
       this.listKeyBindingButtons.add(new W_GuiButton(54, x1 + 90, y + 175, 60, 20, "Reset All"));
       boolean var13 = true;
       boolean var14 = true;
-      MCH_GuiListItemKeyBind[] var10000 = new MCH_GuiListItemKeyBind[23];
+      MCH_GuiListItemKeyBind[] var10000 = new MCH_GuiListItemKeyBind[24];
       MCH_GuiListItemKeyBind var10003 = new MCH_GuiListItemKeyBind(200, 300, x1, "Up", MCH_Config.KeyUp);
       MCH_Config var10009 = MCH_MOD.config;
       var10000[0] = var10003;
@@ -243,6 +243,9 @@ public class MCH_ConfigGui extends W_GuiContainer {
       var10003 = new MCH_GuiListItemKeyBind(223, 323, x1, "Eject Seat Heli", MCH_Config.KeyEjectHeli);
       var10009 = MCH_MOD.config;
       var10000[22] = var10003;
+      var10003 = new MCH_GuiListItemKeyBind(224, 324, x1, "Chaff", MCH_Config.KeyChaff);
+      var10009 = MCH_MOD.config;
+      var10000[23] = var10003;
       MCH_GuiListItemKeyBind[] listKeyBindItems = var10000;
       MCH_GuiListItemKeyBind[] i$ = listKeyBindItems;
       int b = listKeyBindItems.length;

@@ -56,6 +56,11 @@ public abstract class MCH_AircraftClientTickHandler extends MCH_ClientTickHandle
    public MCH_Key KeyBrake;
    public MCH_Key KeyCurrentWeaponLock;
 
+   /**
+    * 箔条按键
+    */
+   public MCH_Key KeyChaff;
+
    public MCH_AircraftClientTickHandler(Minecraft minecraft, MCH_Config config) {
       super(minecraft);
       updateKeybind(config);
@@ -82,6 +87,7 @@ public abstract class MCH_AircraftClientTickHandler extends MCH_ClientTickHandle
       this.KeyDownFromRack = new MCH_Key(MCH_Config.KeyDownFromRack.prmInt);
       this.KeyBrake = new MCH_Key(MCH_Config.KeySwitchHovering.prmInt);
       this.KeyCurrentWeaponLock = new MCH_Key(MCH_Config.KeyCurrentWeaponLock.prmInt);
+      this.KeyChaff = new MCH_Key(MCH_Config.KeyChaff.prmInt);
    }
 
    protected void commonPlayerControlInGUI(EntityPlayer player, MCH_EntityAircraft ac, boolean isPilot, MCH_PacketPlayerControlBase pc) {}
@@ -206,15 +212,26 @@ public abstract class MCH_AircraftClientTickHandler extends MCH_ClientTickHandle
             pc.moveLeft = ac.moveLeft = this.KeyLeft.isKeyPress();
          }
       }
-      if (!ac.isDestroyed() && this.KeyFlare.isKeyDown())
-         if (ac.getSeatIdByEntity((Entity)player) <= 1)
+      if (!ac.isDestroyed() && this.KeyFlare.isKeyDown()) {
+         if (ac.getSeatIdByEntity((Entity) player) <= 1)
             if (ac.canUseFlare() && ac.useFlare(ac.getCurrentFlareType())) {
-               pc.useFlareType = (byte)ac.getCurrentFlareType();
+               pc.useFlareType = (byte) ac.getCurrentFlareType();
                ac.nextFlareType();
                send = true;
             } else {
                playSoundNG();
             }
+      }
+      if (!ac.isDestroyed() && this.KeyChaff.isKeyDown()) {
+         if (ac.getSeatIdByEntity(player) <= 1) {
+            if (ac.canUseChaff() && ac.useChaff()) {
+               pc.useChaff = true;
+               send = true;
+            } else {
+               playSoundNG();
+            }
+         }
+      }
       if (!ac.isDestroyed() && !ac.isPilotReloading()) {
 
          if (this.KeyCurrentWeaponLock.isKeyPress()) {

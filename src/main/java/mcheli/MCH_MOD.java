@@ -29,6 +29,7 @@ import mcheli.chain.MCH_ItemChain;
 import mcheli.command.MCH_Command;
 import mcheli.container.MCH_EntityContainer;
 import mcheli.container.MCH_ItemContainer;
+import mcheli.flare.MCH_EntityChaff;
 import mcheli.flare.MCH_EntityFlare;
 import mcheli.gltd.MCH_EntityGLTD;
 import mcheli.gltd.MCH_ItemGLTD;
@@ -302,6 +303,7 @@ public class MCH_MOD {
       EntityRegistry.registerModEntity(MCH_EntityFlare.class, "MCH.E.Flare", 300, this, 330, 10, true);
       EntityRegistry.registerModEntity(MCH_EntityThrowable.class, "MCH.E.Throwable", 400, this, 330, 10, true);
       EntityRegistry.registerModEntity(MCH_EntityLockBox.class, "MCH.E.LockBox", 401, this, 32, 20, false);
+      EntityRegistry.registerModEntity(MCH_EntityChaff.class, "MCH.E.Chaff", 402, this, 330, 10, true);
    }
 
    @EventHandler

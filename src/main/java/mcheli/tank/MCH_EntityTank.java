@@ -496,10 +496,11 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
             } else {
                this.setCurrentThrottle(0.0D);
                if(this.getAcInfo().enableBack) {
-                  super.throttleBack = (float)((double)super.throttleBack + 0.0025D * (double)throttleUpDown);
-                  if(super.throttleBack > 0.6F) { //todo: add a new variable here for reversespeed
-                     super.throttleBack = 0.6F;
-                  }
+                 // super.throttleBack = (float)((double)super.throttleBack + 0.0025D * (double)throttleUpDown);
+                  super.throttleBack = (float)((double)super.throttleBack + 0.0025D * (double)throttleUpDown * getAcInfo().throttleDownFactor);
+//                  if(super.throttleBack > 0.6F) { //todo: add a new variable here for reversespeed
+//                     super.throttleBack = 0.6F;
+//                  }
                   float pivotTurnThrottle1 = this.getAcInfo().pivotTurnThrottle;
                   if (pivotTurnThrottle1 > 0) {
                      if (super.throttleBack > 0) {

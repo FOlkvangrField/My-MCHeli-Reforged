@@ -103,7 +103,7 @@ public class MCH_WeaponATMissile extends MCH_WeaponEntitySeeker {
             }
          }
       } else {
-         if(getInfo().passiveRadar) {
+         if(getInfo().passiveRadar || getInfo().activeRadar) {
             result = true;
          } else if (super.guidanceSystem.lock(prm.user) && super.guidanceSystem.lastLockEntity != null) {
             result = true;

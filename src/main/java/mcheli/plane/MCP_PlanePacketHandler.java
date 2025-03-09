@@ -94,6 +94,10 @@ public class MCP_PlanePacketHandler {
                   plane.useFlare(pc.useFlareType);
                }
 
+               if(pc.useChaff) {
+                  plane.useChaff();
+               }
+
                if(pc.openGui) {
                   plane.openGui(player);
                }

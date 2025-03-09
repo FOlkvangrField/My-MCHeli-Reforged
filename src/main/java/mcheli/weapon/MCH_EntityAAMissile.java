@@ -101,7 +101,6 @@ public class MCH_EntityAAMissile extends MCH_EntityBaseBullet {
 
          if (closestTarget != null) {
             super.targetEntity = closestTarget;
-            System.out.println("主动弹锁定实体" + ((MCH_EntityAircraft)closestTarget).getAcInfo().name + " 距离" + (int)getDistanceToEntity(closestTarget));
          }
       }
    }

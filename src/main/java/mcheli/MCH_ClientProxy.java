@@ -29,7 +29,9 @@ import mcheli.command.MCH_GuiTitle;
 import mcheli.container.MCH_EntityContainer;
 import mcheli.container.MCH_RenderContainer;
 import mcheli.debug.MCH_RenderTest;
+import mcheli.flare.MCH_EntityChaff;
 import mcheli.flare.MCH_EntityFlare;
+import mcheli.flare.MCH_RenderChaff;
 import mcheli.flare.MCH_RenderFlare;
 import mcheli.gltd.MCH_EntityGLTD;
 import mcheli.gltd.MCH_ItemGLTDRender;
@@ -115,6 +117,7 @@ public class MCH_ClientProxy extends MCH_CommonProxy {
       RenderingRegistry.registerEntityRenderingHandler(MCH_EntityFlare.class, new MCH_RenderFlare());
       RenderingRegistry.registerEntityRenderingHandler(MCH_EntityThrowable.class, new MCH_RenderThrowable());
       RenderingRegistry.registerEntityRenderingHandler(MCH_EntityLockBox.class, new MCH_RenderLockBox());
+      RenderingRegistry.registerEntityRenderingHandler(MCH_EntityChaff.class, new MCH_RenderChaff());
       W_MinecraftForgeClient.registerItemRenderer(MCH_MOD.itemJavelin, new MCH_ItemLightWeaponRender());
       W_MinecraftForgeClient.registerItemRenderer(MCH_MOD.itemStinger, new MCH_ItemLightWeaponRender());
       W_MinecraftForgeClient.registerItemRenderer(MCH_MOD.itemRpg, new MCH_ItemLightWeaponRender());

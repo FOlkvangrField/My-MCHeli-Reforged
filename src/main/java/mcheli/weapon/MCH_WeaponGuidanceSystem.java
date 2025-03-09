@@ -3,6 +3,7 @@ package mcheli.weapon;
 import mcheli.MCH_Lib;
 import mcheli.aircraft.MCH_EntityAircraft;
 import mcheli.aircraft.MCH_EntitySeat;
+import mcheli.flare.MCH_EntityChaff;
 import mcheli.flare.MCH_EntityFlare;
 import mcheli.plane.MCP_EntityPlane;
 import mcheli.uav.MCH_EntityUavStation;
@@ -331,6 +332,10 @@ public class MCH_WeaponGuidanceSystem extends MCH_EntityGuidanceSystem {
          }
          // 红外弹可以锁定热焰弹
          else if(this.isHeatSeekerMissile && entity instanceof MCH_EntityFlare) {
+            return true;
+         }
+         // 雷达弹可以锁定箔条
+         else if(this.isRadarMissile && entity instanceof MCH_EntityChaff) {
             return true;
          }
          // 如果实体既不是生物实体，也不是飞机、车辆等特定类型，返回false

@@ -102,6 +102,10 @@ public class MCH_HeliPacketHandler {
                   heli.useFlare(pc.useFlareType);
                }
 
+               if(pc.useChaff) {
+                  heli.useChaff();
+               }
+
                if(pc.unhitchChainId >= 0) {
                   Entity e1 = player.worldObj.getEntityByID(pc.unhitchChainId);
                   if(e1 instanceof MCH_EntityChain) {

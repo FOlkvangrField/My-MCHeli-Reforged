@@ -11,37 +11,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import mcheli.*;
-import mcheli.aircraft.MCH_AircraftBoundingBox;
-import mcheli.aircraft.MCH_AircraftGuiContainer;
-import mcheli.aircraft.MCH_AircraftInfo;
-import mcheli.aircraft.MCH_AircraftInventory;
-import mcheli.aircraft.MCH_BoundingBox;
-import mcheli.aircraft.MCH_DummyCommandSender;
-import mcheli.aircraft.MCH_EntityHide;
-import mcheli.aircraft.MCH_EntityHitBox;
-import mcheli.aircraft.MCH_EntitySeat;
-import mcheli.aircraft.MCH_IEntityCanRideAircraft;
-import mcheli.aircraft.MCH_ItemFuel;
-import mcheli.aircraft.MCH_MissileDetector;
-import mcheli.aircraft.MCH_PacketIndNotifyAmmoNum;
-import mcheli.aircraft.MCH_PacketIndRotation;
-import mcheli.aircraft.MCH_PacketNotifyAmmoNum;
-import mcheli.aircraft.MCH_PacketNotifyClientSetting;
-import mcheli.aircraft.MCH_PacketNotifyWeaponID;
-import mcheli.aircraft.MCH_PacketSeatListRequest;
-import mcheli.aircraft.MCH_Parts;
-import mcheli.aircraft.MCH_Radar;
-import mcheli.aircraft.MCH_SeatInfo;
-import mcheli.aircraft.MCH_SeatRackInfo;
-import mcheli.aircraft.MCH_SoundUpdater;
 import mcheli.chain.MCH_EntityChain;
 import mcheli.command.MCH_Command;
+import mcheli.flare.MCH_Chaff;
 import mcheli.flare.MCH_Flare;
 import mcheli.multiplay.MCH_Multiplay;
 import mcheli.parachute.MCH_EntityParachute;
 import mcheli.particles.MCH_ParticleParam;
 import mcheli.particles.MCH_ParticlesUtil;
-import mcheli.tool.MCH_ItemWrench;
 import mcheli.uav.MCH_EntityUavStation;
 import mcheli.weapon.*;
 import mcheli.wrapper.*;
@@ -54,7 +31,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityMinecartEmpty;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemPickaxe;
@@ -69,14 +45,12 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ForgeChunkManager;
-
-import static mcheli.hud.MCH_HudItem.player;
 //import static net.minecraft.command.CommandBase.getCommandSenderAsPlayer;
 //import static net.minecraft.command.CommandBase.getPlayer;
 
 public abstract class MCH_EntityAircraft extends W_EntityContainer implements MCH_IEntityLockChecker, MCH_IEntityCanRideAircraft, IEntityAdditionalSpawnData {
    private static MCH_EntityAircraft aircraft;
-   private ForgeChunkManager.Ticket chunkTicket;
+    private ForgeChunkManager.Ticket chunkTicket;
    //MCH_EntityAircraft ac = null;
    private static final int DATAWT_ID_DAMAGE = 19;
    private static final int DATAWT_ID_TYPE = 20;
@@ -246,18 +220,19 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
    //public static Entity rider = lastRidingEntity;
    //MCH_EntityAircraft MCH_EntityUavStation;
 
-
    private boolean switchSeat = false;
-   //public EntityPlayerMP playerEntity = (EntityPlayerMP) getCommandSenderAsPlayer(player);
+   //public EntityPlayerMP playerEntity = (EntityPlayerMP) getCommandSenderAsPlayer(player);\
 
+   public MCH_Chaff chaff;
 
    public MCH_EntityAircraft(World world) {
       super(world);
-      this.setAcInfo((MCH_AircraftInfo)null);
+      this.setAcInfo(null);
       this.commonStatus = 0;
       super.dropContentsWhenDead = false;
       super.ignoreFrustumCheck = true;
       this.flareDv = new MCH_Flare(world, this);
+      this.chaff = new MCH_Chaff(world, this);
       this.currentFlareIndex = 0;
       this.entityRadar = new MCH_Radar(world);
       this.radarRotate = 0;
@@ -1480,6 +1455,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       this.updateControl();
       this.checkServerNoMove();
       this.onUpdate_RidingEntity();
+
       Iterator itr = this.listUnmountReserve.iterator();
 
       while(itr.hasNext()) {
@@ -1615,6 +1591,11 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       this.autoRepair();
       var7 = this.getFlareTick();
       this.flareDv.update();
+      if(this.getAcInfo() != null && this.chaff != null) {
+         this.chaff.chaffUseTime = getAcInfo().chaffUseTime;
+         this.chaff.chaffWaitTime = getAcInfo().chaffWaitTime;
+         this.chaff.onUpdate();
+      }
       if(!super.worldObj.isRemote && this.getFlareTick() == 0 && var7 != 0) {
          this.setCommonStatus(0, false);
       }
@@ -3149,6 +3130,17 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       }
    }
 
+   public boolean useChaff() {
+      if(this.getAcInfo() != null && this.getAcInfo().haveChaff()) {
+         if(this.chaff.onUse()) {
+            return true;
+         }
+         return false;
+      } else {
+         return false;
+      }
+   }
+
    public int getCurrentFlareType() {
       return !this.haveFlare()?0:this.getAcInfo().flare.types[this.currentFlareIndex];
    }
@@ -3161,7 +3153,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
    }
 
    public boolean canUseFlare() {
-      return this.getAcInfo() != null && this.getAcInfo().haveFlare()?(this.getCommonStatus(0)?false:this.flareDv.tick == 0):false;
+      return this.getAcInfo() != null && this.getAcInfo().haveFlare() && (!this.getCommonStatus(0) && this.flareDv.tick == 0);
    }
 
    public boolean isFlarePreparation() {
@@ -3182,6 +3174,10 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
 
    public boolean haveFlare(int seatID) {
       return this.haveFlare() && seatID >= 0 && seatID <= 1;
+   }
+
+   public boolean canUseChaff() {
+      return this.getAcInfo() != null && this.getAcInfo().haveChaff() && this.chaff.tick == 0;
    }
 
    public MCH_EntitySeat[] getSeats() {
@@ -5537,7 +5533,6 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
          this.partEntities = this.createParts();
          super.stepHeight = info.stepHeight;
       }
-
    }
 
    public MCH_BoundingBox[] createExtraBoundingBox() {
@@ -6082,8 +6077,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       return "?";
     }
 
-
-    public class WeaponBay {
+   public class WeaponBay {
 
       public float rot = 0.0F;
       public float prevRot = 0.0F;

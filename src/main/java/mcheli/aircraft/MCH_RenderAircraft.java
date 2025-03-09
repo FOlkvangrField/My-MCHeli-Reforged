@@ -9,6 +9,7 @@ import mcheli.MCH_ClientEventHook;
 import mcheli.MCH_Config;
 import mcheli.MCH_Lib;
 import mcheli.MCH_MOD;
+import mcheli.flare.MCH_EntityChaff;
 import mcheli.flare.MCH_EntityFlare;
 import mcheli.gui.MCH_Gui;
 import mcheli.lweapon.MCH_ClientLightWeaponTickHandler;
@@ -1153,7 +1154,9 @@ public abstract class MCH_RenderAircraft extends W_Render {
                            int prevWidth = GL11.glGetInteger(2849);
                            // 设置目标实体大小（根据实体的宽度和高度进行调整）
                            float size1 = Math.max(entity.width, entity.height) * 20.0F;
-                           if(entity instanceof MCH_EntityAircraft || entity instanceof MCH_EntityFlare) {
+                           if(entity instanceof MCH_EntityAircraft
+                                   || entity instanceof MCH_EntityFlare
+                                   || entity instanceof MCH_EntityChaff) {
                               size1 *= 2.0F; // 飞机类型实体大小加倍
                            }
                            float size = size1 + (float)((distance - 10.0D) / (300.0D - 10.0D)) * (300.0F - size1);
