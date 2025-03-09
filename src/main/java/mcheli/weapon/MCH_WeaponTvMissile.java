@@ -1,5 +1,7 @@
 package mcheli.weapon;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import mcheli.MCH_MOD;
 import mcheli.aircraft.MCH_EntityAircraft;
 import mcheli.aircraft.MCH_PacketNotifyTVMissileEntity;
@@ -41,9 +43,14 @@ public class MCH_WeaponTvMissile extends MCH_WeaponBase {
          guidanceSystem.worldObj = w;
          guidanceSystem.hasLaserGuidancePod = wi.hasLaserGuidancePod;
          if (w.isRemote) {
-            guidanceSystem.user = Minecraft.getMinecraft().thePlayer;
+            initGuidanceSystemClient();
          }
       }
+   }
+
+   @SideOnly(Side.CLIENT)
+   public void initGuidanceSystemClient() {
+      guidanceSystem.user = Minecraft.getMinecraft().thePlayer;
    }
 
    @Override
