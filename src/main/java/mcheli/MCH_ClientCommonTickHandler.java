@@ -1,21 +1,9 @@
 package mcheli;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import java.util.Iterator;
-import java.util.List;
 
-import mcheli.MCH_ClientEventHook;
-import mcheli.MCH_ClientTickHandlerBase;
-import mcheli.MCH_Config;
-import mcheli.MCH_GuiCommon;
-import mcheli.MCH_Key;
-import mcheli.MCH_MOD;
-import mcheli.MCH_PacketIndOpenScreen;
-import mcheli.MCH_ServerSettings;
-import mcheli.MCH_ViewEntityDummy;
 import mcheli.aircraft.*;
 import mcheli.command.MCH_GuiTitle;
 import mcheli.gltd.MCH_ClientGLTDTickHandler;
@@ -59,7 +47,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import org.lwjgl.opengl.Display;
 
 @SideOnly(Side.CLIENT)
@@ -230,7 +217,6 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
       if(lockedSoundCount > 0) {
          --lockedSoundCount;
       }
-
    }
 
    public void onTickPre() {
@@ -244,7 +230,7 @@ public class MCH_ClientCommonTickHandler extends W_TickHandler {
       if(super.mc.thePlayer != null && super.mc.theWorld != null) {
          MCH_GuiTargetMarker.onClientTick();
       }
-
+      MCH_PlayerViewHandler.onUpdate();
    }
 
    public static double getCurrentStickX() {

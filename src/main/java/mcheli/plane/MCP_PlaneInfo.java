@@ -30,6 +30,7 @@ public class MCP_PlaneInfo extends MCH_AircraftInfo {
    public MCP_PlaneInfo(String name) {
       super(name);
       this.sweepWingSpeed = super.speed;
+      this.motionFactor = 0.99F;
    }
 
    public float getDefaultRotorSpeed() {

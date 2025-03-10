@@ -2,13 +2,9 @@ package mcheli.weapon;
 
 import mcheli.wrapper.W_Entity;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MCH_WeaponAAMissile extends MCH_WeaponEntitySeeker {
 

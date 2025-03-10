@@ -774,14 +774,18 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
       }
 
       if(canMove) {
-         if(this.getAcInfo().enableBack && super.throttleBack > 0.0F) {
-            super.motionX -= v.xCoord * (double)super.throttleBack;
-            super.motionZ -= v.zCoord * (double)super.throttleBack;
+         if (this.getAcInfo().enableBack && super.throttleBack > 0.0F) {
+            super.motionX -= v.xCoord * (double) super.throttleBack;
+            super.motionZ -= v.zCoord * (double) super.throttleBack;
          } else {
-            super.motionX += v.xCoord * (double)throttle1;
-            super.motionZ += v.zCoord * (double)throttle1;
+            super.motionX += v.xCoord * (double) throttle1;
+            super.motionZ += v.zCoord * (double) throttle1;
          }
       }
+
+      super.motionY *= 0.95D;
+      super.motionX *= (double)this.getAcInfo().motionFactor;
+      super.motionZ *= (double)this.getAcInfo().motionFactor;
 
       double motion1 = Math.sqrt(super.motionX * super.motionX + super.motionZ * super.motionZ);
       float speedLimit = this.getMaxSpeed();
@@ -812,9 +816,7 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
       }
 
       this.moveEntity(super.motionX, super.motionY, super.motionZ);
-      super.motionY *= 0.95D;
-      super.motionX *= (double)this.getAcInfo().motionFactor;
-      super.motionZ *= (double)this.getAcInfo().motionFactor;
+
       this.setRotation(this.getRotYaw(), this.getRotPitch());
       this.onUpdate_updateBlock();
       if(this.getRiddenByEntity() != null && this.getRiddenByEntity().isDead) {

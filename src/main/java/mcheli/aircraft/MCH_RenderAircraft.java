@@ -332,6 +332,7 @@ public abstract class MCH_RenderAircraft extends W_Render {
             }
 
             W_EntityRenderer.renderEntityWithPosYaw(super.renderManager, entity, dx, dy, dz, f1, tickTime, false);
+
             if(isPilot && entityLiving != null && ac.getCameraId() > 0) {
                entityLiving.rotationPitch = bkPitch;
                entityLiving.prevRotationPitch = bkPrevPitch;

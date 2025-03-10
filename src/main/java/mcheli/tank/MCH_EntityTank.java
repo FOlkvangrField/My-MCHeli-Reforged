@@ -736,9 +736,9 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
    }
 
    protected void onUpdate_Client() {
-      if(this.getRiddenByEntity() != null && W_Lib.isClientPlayer(this.getRiddenByEntity())) {
-         this.getRiddenByEntity().rotationPitch = this.getRiddenByEntity().prevRotationPitch;
-      }
+//      if(this.getRiddenByEntity() != null && W_Lib.isClientPlayer(this.getRiddenByEntity())) {
+//         this.getRiddenByEntity().rotationPitch = this.getRiddenByEntity().prevRotationPitch;
+//      }
 
       if(super.aircraftPosRotInc > 0) {
          this.applyServerPositionAndRotation();

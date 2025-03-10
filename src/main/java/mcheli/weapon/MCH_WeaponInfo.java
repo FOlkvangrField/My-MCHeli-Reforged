@@ -15,9 +15,10 @@ import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MCH_WeaponInfo extends MCH_BaseInfo {
-
+    public static Random rand = new Random();
     public final String name;
     public String explosionType;
     public int nukeYield;
@@ -208,6 +209,27 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
      * 武器切换音效
      */
     public String weaponSwitchSound = "";
+
+    /**
+     * 武器垂直后坐力
+     */
+    public float recoilPitch = 0.0F;
+    /**
+     * 武器水平后坐力（固定方向）
+     */
+    public float recoilYaw = 0.0F;
+    /**
+     * 武器随机垂直后坐力 (Recoil 2 + rndRecoil 0.5 == 1.5-2.5 Recoil range)
+     */
+    public float recoilPitchRange = 0.0F;
+    /**
+     * 武器随机水平后坐力
+     */
+    public float recoilYawRange = 0.0F;
+    /**
+     * 武器后坐力恢复速度
+     */
+    public float recoilRecoverFactor = 0.8F;
 
     public MCH_WeaponInfo(String name) {
         this.name = name;
@@ -453,6 +475,16 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
                 this.weaponSwitchCount = this.toInt(data);
             } else if (item.equalsIgnoreCase("WeaponSwitchSound")) {
                 this.weaponSwitchSound = data.toLowerCase().trim();
+            } else if (item.equalsIgnoreCase("RecoilPitch")) {
+                this.recoilPitch = this.toFloat(data);
+            } else if (item.equalsIgnoreCase("RecoilYaw")) {
+                this.recoilYaw = this.toFloat(data);
+            } else if (item.equalsIgnoreCase("RecoilPitchRange")) {
+                this.recoilPitchRange = this.toFloat(data);
+            } else if (item.equalsIgnoreCase("RecoilYawRange")) {
+                this.recoilYawRange = this.toFloat(data);
+            } else if (item.equalsIgnoreCase("RecoilRecoverFactor")) {
+                this.recoilRecoverFactor = this.toFloat(data);
             }
 
             else if (item.compareTo("reloadtime") == 0) {
@@ -658,6 +690,14 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
 
     public String getWeaponTypeName() {
         return this.type.equalsIgnoreCase("MachineGun1") ? "MachineGun" : (this.type.equalsIgnoreCase("MachineGun2") ? "MachineGun" : (this.type.equalsIgnoreCase("Torpedo") ? "Torpedo" : (this.type.equalsIgnoreCase("CAS") ? "CAS" : (this.type.equalsIgnoreCase("Rocket") ? "Rocket" : (this.type.equalsIgnoreCase("ASMissile") ? "AS Missile" : (this.type.equalsIgnoreCase("AAMissile") ? "AA Missile" : (this.type.equalsIgnoreCase("TVMissile") ? "TV Missile" : (this.type.equalsIgnoreCase("ATMissile") ? "AT Missile" : (this.type.equalsIgnoreCase("Bomb") ? "Bomb" : (this.type.equalsIgnoreCase("MkRocket") ? "Mk Rocket" : (this.type.equalsIgnoreCase("Dummy") ? "Dummy" : (this.type.equalsIgnoreCase("Smoke") ? "Smoke" : (this.type.equalsIgnoreCase("Smoke") ? "Smoke" : (this.type.equalsIgnoreCase("Dispenser") ? "Dispenser" : (this.type.equalsIgnoreCase("TargetingPod") ? "Targeting Pod" : "")))))))))))))));
+    }
+
+    public float getRecoilPitch() {
+        return this.recoilPitch + (rand.nextFloat() * this.recoilPitchRange);
+    }
+
+    public float getRecoilYaw() {
+        return this.recoilYaw + ((rand.nextFloat() - 0.5F) * this.recoilYawRange);
     }
 
     public class RoundItem {
