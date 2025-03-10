@@ -171,6 +171,12 @@ public class MCH_WeaponGuidanceSystem extends MCH_EntityGuidanceSystem {
          } else if(this.targetEntity != null && !this.targetEntity.isDead) {  // 如果已经有目标并且目标未死亡
             boolean canLockTarget = true;  // 是否可以继续锁定目标
 
+            if(targetEntity instanceof MCH_EntityAircraft) {
+               if(isRadarMissile && targetEntity.getEntityData().getBoolean("ChaffUsing")) {
+                  canLockTarget = false;
+               }
+            }
+
             // 检查目标是否在水中，如果不能锁定水中目标，则设为false
             if(!this.canLockInWater && this.targetEntity.isInWater()) {
                canLockTarget = false;

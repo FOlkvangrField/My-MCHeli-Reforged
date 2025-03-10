@@ -2,6 +2,8 @@ package mcheli.flare;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import mcheli.particles.MCH_ParticleParam;
+import mcheli.particles.MCH_ParticlesUtil;
 import mcheli.weapon.MCH_IEntityLockChecker;
 import mcheli.wrapper.W_Entity;
 import mcheli.wrapper.W_WorldFunc;
@@ -16,10 +18,11 @@ public class MCH_EntityChaff extends W_Entity implements MCH_IEntityLockChecker 
 
    public double gravity;
    public double airResistance;
+   public static final int MAX_TICK_EXISTED = 200;
 
    public MCH_EntityChaff(World par1World) {
       super(par1World);
-      this.gravity = -0.0025D;
+      this.gravity = -0.001D;
       this.airResistance = 0.99D;
       this.setSize(1.0F, 1.0F);
       super.prevRotationYaw = super.rotationYaw;
@@ -40,7 +43,7 @@ public class MCH_EntityChaff extends W_Entity implements MCH_IEntityLockChecker 
       if (worldObj.isRemote) {
          renderDistanceWeight = 500;
       }
-      if(ticksExisted > 200) {
+      if(ticksExisted > MAX_TICK_EXISTED) {
          setDead();
       }
       if(!super.worldObj.isRemote && !super.worldObj.blockExists((int)super.posX, (int)super.posY, (int)super.posZ)) {
@@ -59,6 +62,7 @@ public class MCH_EntityChaff extends W_Entity implements MCH_IEntityLockChecker 
          super.motionY += this.gravity;
          super.motionX *= this.airResistance;
          super.motionZ *= this.airResistance;
+
          if(this.isInWater() && !super.worldObj.isRemote) {
             setDead();
          }
@@ -69,6 +73,13 @@ public class MCH_EntityChaff extends W_Entity implements MCH_IEntityLockChecker 
 
          this.setPosition(super.posX, super.posY, super.posZ);
       }
+   }
+
+   @SideOnly(Side.CLIENT)
+   public boolean isInRangeToRenderDist(double par1) {
+      double d1 = super.boundingBox.getAverageEdgeLength() * 4.0D;
+      d1 *= 64.0D;
+      return par1 < d1 * d1;
    }
 
    @Override

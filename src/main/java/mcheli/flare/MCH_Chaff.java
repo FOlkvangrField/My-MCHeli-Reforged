@@ -1,6 +1,5 @@
 package mcheli.flare;
 
-import mcheli.MCH_Lib;
 import mcheli.aircraft.MCH_EntityAircraft;
 import mcheli.wrapper.W_McClient;
 import net.minecraft.world.World;
@@ -50,7 +49,6 @@ public class MCH_Chaff {
     }
 
     public void onUpdate() {
-        System.out.println("MCH_Chaff.onUpdate");
         if (this.aircraft != null && !this.aircraft.isDead) {
             if (this.tick > 0) {
                 --this.tick;
@@ -74,7 +72,7 @@ public class MCH_Chaff {
                 spawnChaffEntity();
             }
             if(worldObj.isRemote) {
-                W_McClient.MOD_playSoundFX("remotegun_f", 100.0F, 1.0F);
+                W_McClient.MOD_playSoundFX("remotegun_f", 10.0F, 10.0F);
             }
         }
         if(spawnChaffEntityIntervalTick > 0) {
@@ -93,20 +91,14 @@ public class MCH_Chaff {
         double motionY = this.aircraft.motionY;
         double motionZ = this.aircraft.motionZ;
 
-        // 获取飞机的旋转角度（朝向）
-        float yaw = this.aircraft.rotationYaw;
-
-        // 计算后方的偏移量，使用飞机的旋转角度
-        double offsetX = -Math.sin(Math.toRadians(yaw)) * 5.0; // 后方偏移X（乘以5.0控制距离）
-        double offsetZ = Math.cos(Math.toRadians(yaw)) * 5.0;  // 后方偏移Z（乘以5.0控制距离）
-
-        // 根据速度调整Y轴偏移
-        double offsetY = motionY * 0.5D;
-
         // 创建干扰箔条实体
+        double offsetX = -motionX * 20D;
+        double offsetY = -motionY * 20D;
+        double offsetZ = -motionZ * 20D;
+
         MCH_EntityChaff e = new MCH_EntityChaff(worldObj,
                 x + offsetX, y + offsetY, z + offsetZ,
-                motionX * 0.5D, motionY * 0.5D, motionZ * 0.5D);
+                motionX * 0.5, motionY * 0.5, motionZ * 0.5);
 
         // 将干扰箔条实体加入到世界中
         this.worldObj.spawnEntityInWorld(e);
@@ -118,6 +110,6 @@ public class MCH_Chaff {
     }
 
     public boolean isUsing() {
-        return this.tick != 0;
+        return this.useTick > 0;
     }
 }
