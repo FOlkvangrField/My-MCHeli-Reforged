@@ -1,27 +1,17 @@
 package mcheli.aircraft;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import mcheli.MCH_BaseInfo;
 import mcheli.MCH_MOD;
-import mcheli.aircraft.MCH_BoundingBox;
-import mcheli.aircraft.MCH_MobDropOption;
-import mcheli.aircraft.MCH_SeatInfo;
-import mcheli.aircraft.MCH_SeatRackInfo;
-import mcheli.flare.MCH_Chaff;
 import mcheli.hud.MCH_Hud;
 import mcheli.hud.MCH_HudManager;
 import mcheli.weapon.MCH_WeaponInfoManager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.model.IModelCustom;
+
+import java.util.*;
 
 public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
 
@@ -43,6 +33,7 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
    public boolean isEnableParachuting;
    public MCH_AircraftInfo.Flare flare;
    public MCH_AircraftInfo.Chaff chaff;
+   public MCH_AircraftInfo.Maintenance maintenance;
    public float bodyHeight;
    public float bodyWidth;
    public boolean isFloat;
@@ -191,6 +182,16 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
     * 箔条冷却时长
     */
    public int chaffWaitTime = 400;
+
+   /**
+    * 维修系统生效时长 （时长即为回血百分比）
+    */
+   public int maintenanceUseTime = 30;
+
+   /**
+    * 维修系统冷却时长
+    */
+   public int maintenanceWaitTime = 300;
 
    public abstract Item getItem();
 
@@ -854,6 +855,12 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
                                              chaffUseTime = this.toInt(data, 0, 10000);
                                           } else if(item.equalsIgnoreCase("ChaffWaitTime")) {
                                              chaffWaitTime = this.toInt(data, 0, 10000);
+                                          } else if(item.equalsIgnoreCase("HasMaintenance")) {
+                                             maintenance = new MCH_AircraftInfo.Maintenance();
+                                          } else if(item.equalsIgnoreCase("MaintenanceUseTime")) {
+                                             maintenanceUseTime = this.toInt(data, 0, 100);
+                                          } else if(item.equalsIgnoreCase("MaintenanceWaitTime")) {
+                                             maintenanceWaitTime = this.toInt(data, 0, 10000);
                                           }
                                           else if(item.equalsIgnoreCase("Sound")) {
                                              this.soundMove = data.toLowerCase();
@@ -1350,6 +1357,10 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
       return this.chaff != null;
    }
 
+   public boolean haveMaintenance() {
+      return this.maintenance != null;
+   }
+
    public class RotPart extends MCH_AircraftInfo.DrawnPart {
 
       public final float rotSpeed;
@@ -1648,6 +1659,10 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
    public class Chaff {
 
       public Vec3 pos = Vec3.createVectorHelper(0.0D, 0.0D, 0.0D);
+
+   }
+
+   public class Maintenance {
 
    }
 

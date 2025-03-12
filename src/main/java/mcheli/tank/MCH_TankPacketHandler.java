@@ -97,6 +97,10 @@ public class MCH_TankPacketHandler {
                   tank.useChaff();
                }
 
+               if(pc.useMaintenance) {
+                  tank.useMaintenance();
+               }
+
                if(pc.openGui) {
                   tank.openGui(player);
                }

@@ -98,6 +98,10 @@ public class MCP_PlanePacketHandler {
                   plane.useChaff();
                }
 
+               if(pc.useMaintenance) {
+                  plane.useMaintenance();
+               }
+
                if(pc.openGui) {
                   plane.openGui(player);
                }

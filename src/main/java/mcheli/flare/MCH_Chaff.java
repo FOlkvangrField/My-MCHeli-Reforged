@@ -36,7 +36,7 @@ public class MCH_Chaff {
                 useTick = chaffUseTime;
                 spawnChaffEntityIntervalTick = 0;
                 result = true;
-                W_McClient.DEF_playSoundFX("random.click", 1.0F, 1.0F);
+                //W_McClient.DEF_playSoundFX("flare_deploy", 10.0F, 1.0F);
             }
         } else {
             result = true;
@@ -72,7 +72,7 @@ public class MCH_Chaff {
                 spawnChaffEntity();
             }
             if(worldObj.isRemote) {
-                W_McClient.MOD_playSoundFX("remotegun_f", 10.0F, 10.0F);
+                W_McClient.MOD_playSoundFX("chaff", 10.0F, 1.0F);
             }
         }
         if(spawnChaffEntityIntervalTick > 0) {

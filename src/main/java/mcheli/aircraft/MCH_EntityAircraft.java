@@ -15,6 +15,7 @@ import mcheli.chain.MCH_EntityChain;
 import mcheli.command.MCH_Command;
 import mcheli.flare.MCH_Chaff;
 import mcheli.flare.MCH_Flare;
+import mcheli.flare.MCH_Maintenance;
 import mcheli.multiplay.MCH_Multiplay;
 import mcheli.parachute.MCH_EntityParachute;
 import mcheli.particles.MCH_ParticleParam;
@@ -224,7 +225,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
    //public EntityPlayerMP playerEntity = (EntityPlayerMP) getCommandSenderAsPlayer(player);\
 
    public MCH_Chaff chaff;
-
+   public MCH_Maintenance maintenance;
    public MCH_EntityAircraft(World world) {
       super(world);
       this.setAcInfo(null);
@@ -233,6 +234,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       super.ignoreFrustumCheck = true;
       this.flareDv = new MCH_Flare(world, this);
       this.chaff = new MCH_Chaff(world, this);
+      this.maintenance = new MCH_Maintenance(world, this);
       this.currentFlareIndex = 0;
       this.entityRadar = new MCH_Radar(world);
       this.radarRotate = 0;
@@ -1595,6 +1597,11 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
          this.chaff.chaffUseTime = getAcInfo().chaffUseTime;
          this.chaff.chaffWaitTime = getAcInfo().chaffWaitTime;
          this.chaff.onUpdate();
+      }
+      if(this.getAcInfo() != null && this.maintenance != null) {
+         this.maintenance.useTime = getAcInfo().maintenanceUseTime;
+         this.maintenance.waitTime = getAcInfo().maintenanceWaitTime;
+         this.maintenance.onUpdate();
       }
       if(!super.worldObj.isRemote && this.getFlareTick() == 0 && var7 != 0) {
          this.setCommonStatus(0, false);
@@ -3141,6 +3148,17 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       }
    }
 
+   public boolean useMaintenance() {
+      if(this.getAcInfo() != null && this.getAcInfo().haveMaintenance()) {
+         if(this.maintenance.onUse()) {
+            return true;
+         }
+         return false;
+      } else {
+         return false;
+      }
+   }
+
    public int getCurrentFlareType() {
       return !this.haveFlare()?0:this.getAcInfo().flare.types[this.currentFlareIndex];
    }
@@ -3178,6 +3196,10 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
 
    public boolean canUseChaff() {
       return this.getAcInfo() != null && this.getAcInfo().haveChaff() && this.chaff.tick == 0;
+   }
+
+   public boolean canUseMaintenance() {
+      return this.getAcInfo() != null && this.getAcInfo().haveMaintenance() && this.maintenance.tick == 0;
    }
 
    public MCH_EntitySeat[] getSeats() {
