@@ -34,6 +34,7 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
    public MCH_AircraftInfo.Flare flare;
    public MCH_AircraftInfo.Chaff chaff;
    public MCH_AircraftInfo.Maintenance maintenance;
+   public MCH_AircraftInfo.APS aps;
    public float bodyHeight;
    public float bodyWidth;
    public boolean isFloat;
@@ -186,12 +187,31 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
    /**
     * 维修系统生效时长 （时长即为回血百分比）
     */
-   public int maintenanceUseTime = 30;
+   public int maintenanceUseTime = 20;
 
    /**
     * 维修系统冷却时长
     */
    public int maintenanceWaitTime = 300;
+
+   /**
+    * 载具瘫痪阈值，血量低于此百分比将关闭载具引擎
+    */
+   public int engineShutdownThreshold = 20;
+
+   /**
+    * APS生效时长
+    */
+   public int apsUseTime = 100;
+   /**
+    * APS冷却时长
+    */
+   public int apsWaitTime = 400;
+
+   /**
+    * APS范围
+    */
+   public int apsRange = 8;
 
    public abstract Item getItem();
 
@@ -861,6 +881,16 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
                                              maintenanceUseTime = this.toInt(data, 0, 100);
                                           } else if(item.equalsIgnoreCase("MaintenanceWaitTime")) {
                                              maintenanceWaitTime = this.toInt(data, 0, 10000);
+                                          } else if(item.equalsIgnoreCase("EngineShutdownThreshold")) {
+                                             engineShutdownThreshold = this.toInt(data, 0, 100);
+                                          } else if(item.equalsIgnoreCase("HasAPS")) {
+                                             aps = new MCH_AircraftInfo.APS();
+                                          } else if(item.equalsIgnoreCase("APSUseTime")) {
+                                             apsUseTime = this.toInt(data, 0, 10000);
+                                          } else if(item.equalsIgnoreCase("APSWaitTime")) {
+                                             apsWaitTime = this.toInt(data, 0, 10000);
+                                          } else if(item.equalsIgnoreCase("APSRange")) {
+                                             apsRange = this.toInt(data, 0, 100);
                                           }
                                           else if(item.equalsIgnoreCase("Sound")) {
                                              this.soundMove = data.toLowerCase();
@@ -1361,6 +1391,10 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
       return this.maintenance != null;
    }
 
+   public boolean haveAPS() {
+      return this.aps != null;
+   }
+
    public class RotPart extends MCH_AircraftInfo.DrawnPart {
 
       public final float rotSpeed;
@@ -1663,6 +1697,10 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
    }
 
    public class Maintenance {
+
+   }
+
+   public class APS {
 
    }
 

@@ -64,6 +64,10 @@ public abstract class MCH_AircraftClientTickHandler extends MCH_ClientTickHandle
     * 维修按键
     */
    public MCH_Key KeyMaintenance;
+   /**
+    * APS按键
+    */
+   public MCH_Key KeyAPS;
 
    public MCH_AircraftClientTickHandler(Minecraft minecraft, MCH_Config config) {
       super(minecraft);
@@ -93,6 +97,7 @@ public abstract class MCH_AircraftClientTickHandler extends MCH_ClientTickHandle
       this.KeyCurrentWeaponLock = new MCH_Key(MCH_Config.KeyCurrentWeaponLock.prmInt);
       this.KeyChaff = new MCH_Key(MCH_Config.KeyChaff.prmInt);
       this.KeyMaintenance = new MCH_Key(MCH_Config.KeyMaintenance.prmInt);
+      this.KeyAPS = new MCH_Key(MCH_Config.KeyAPS.prmInt);
    }
 
    protected void commonPlayerControlInGUI(EntityPlayer player, MCH_EntityAircraft ac, boolean isPilot, MCH_PacketPlayerControlBase pc) {}
@@ -241,6 +246,16 @@ public abstract class MCH_AircraftClientTickHandler extends MCH_ClientTickHandle
          if (ac.getSeatIdByEntity(player) <= 1) {
             if (ac.canUseMaintenance() && ac.useMaintenance()) {
                pc.useMaintenance = true;
+               send = true;
+            } else {
+               playSoundNG();
+            }
+         }
+      }
+      if (!ac.isDestroyed() && this.KeyAPS.isKeyDown()) {
+         if (ac.getSeatIdByEntity(player) <= 1) {
+            if (ac.canUseAPS() && ac.useAPS(player)) {
+               pc.useAPS = true;
                send = true;
             } else {
                playSoundNG();

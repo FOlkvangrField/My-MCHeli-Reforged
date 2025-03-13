@@ -110,6 +110,10 @@ public class MCH_HeliPacketHandler {
                   heli.useMaintenance();
                }
 
+               if(pc.useAPS) {
+                  heli.useAPS(player);
+               }
+
                if(pc.unhitchChainId >= 0) {
                   Entity e1 = player.worldObj.getEntityByID(pc.unhitchChainId);
                   if(e1 instanceof MCH_EntityChain) {

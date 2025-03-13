@@ -13,6 +13,7 @@ import java.util.List;
 import mcheli.*;
 import mcheli.chain.MCH_EntityChain;
 import mcheli.command.MCH_Command;
+import mcheli.flare.MCH_APS;
 import mcheli.flare.MCH_Chaff;
 import mcheli.flare.MCH_Flare;
 import mcheli.flare.MCH_Maintenance;
@@ -226,6 +227,8 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
 
    public MCH_Chaff chaff;
    public MCH_Maintenance maintenance;
+   public MCH_APS aps;
+
    public MCH_EntityAircraft(World world) {
       super(world);
       this.setAcInfo(null);
@@ -235,6 +238,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       this.flareDv = new MCH_Flare(world, this);
       this.chaff = new MCH_Chaff(world, this);
       this.maintenance = new MCH_Maintenance(world, this);
+      this.aps = new MCH_APS(world, this);
       this.currentFlareIndex = 0;
       this.entityRadar = new MCH_Radar(world);
       this.radarRotate = 0;
@@ -595,7 +599,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
    }
 
    public int getHP() {
-      return this.getMaxHP() - this.getDamageTaken() >= 0?this.getMaxHP() - this.getDamageTaken():0;
+      return Math.max(this.getMaxHP() - this.getDamageTaken(), 0);
    }
 
    public void setDamageTaken(int par1) {
@@ -1602,6 +1606,12 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
          this.maintenance.useTime = getAcInfo().maintenanceUseTime;
          this.maintenance.waitTime = getAcInfo().maintenanceWaitTime;
          this.maintenance.onUpdate();
+      }
+      if(this.getAcInfo() != null && this.aps != null) {
+         this.aps.useTime = getAcInfo().apsUseTime;
+         this.aps.waitTime = getAcInfo().apsWaitTime;
+         this.aps.range = getAcInfo().apsRange;
+         this.aps.onUpdate();
       }
       if(!super.worldObj.isRemote && this.getFlareTick() == 0 && var7 != 0) {
          this.setCommonStatus(0, false);
@@ -3159,6 +3169,17 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       }
    }
 
+   public boolean useAPS(Entity e) {
+      if(this.getAcInfo() != null && this.getAcInfo().haveAPS()) {
+         if(this.aps.onUse(e)) {
+            return true;
+         }
+         return false;
+      } else {
+         return false;
+      }
+   }
+
    public int getCurrentFlareType() {
       return !this.haveFlare()?0:this.getAcInfo().flare.types[this.currentFlareIndex];
    }
@@ -3200,6 +3221,22 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
 
    public boolean canUseMaintenance() {
       return this.getAcInfo() != null && this.getAcInfo().haveMaintenance() && this.maintenance.tick == 0;
+   }
+
+   public boolean canUseAPS() {
+      return this.getAcInfo() != null && this.getAcInfo().haveAPS() && this.aps.tick == 0;
+   }
+
+   public boolean haveChaff() {
+      return this.getAcInfo() != null && this.getAcInfo().haveChaff();
+   }
+
+   public boolean haveMaintenance() {
+      return this.getAcInfo() != null && this.getAcInfo().haveMaintenance();
+   }
+
+   public boolean haveAPS() {
+      return this.getAcInfo() != null && this.getAcInfo().haveAPS();
    }
 
    public MCH_EntitySeat[] getSeats() {

@@ -842,7 +842,7 @@ public class MCP_EntityPlane extends MCH_EntityAircraft {
       if(motion1 > (double)speedLimit) {
          super.motionX *= (double)speedLimit / motion1;
          super.motionZ *= (double)speedLimit / motion1;
-         motion1 = (double)speedLimit;
+         motion1 = speedLimit;
       }
 
       // 如果当前速度大于上一帧的速度，并且当前速度小于最大速度限制，逐步增加速度

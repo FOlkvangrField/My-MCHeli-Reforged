@@ -102,6 +102,10 @@ public class MCP_PlanePacketHandler {
                   plane.useMaintenance();
                }
 
+               if(pc.useAPS) {
+                  plane.useAPS(player);
+               }
+
                if(pc.openGui) {
                   plane.openGui(player);
                }

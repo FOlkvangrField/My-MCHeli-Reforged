@@ -87,8 +87,16 @@ public class MCH_LaserGuidanceSystem implements MCH_IGuidanceSystem {
             targetY = targetY * maxDist / dist;
             targetZ = targetZ * maxDist / dist;
 
+//            double posX = user.posX;
+//            double posY = user.posY + user.getEyeHeight();
+//            double posZ = user.posZ;
+
+            double posX = RenderManager.renderPosX;
+            double posY = RenderManager.renderPosY;
+            double posZ = RenderManager.renderPosZ;
+
             // 计算发射源
-            Vec3 src = W_WorldFunc.getWorldVec3(this.worldObj, RenderManager.renderPosX, RenderManager.renderPosY, RenderManager.renderPosZ);
+            Vec3 src = W_WorldFunc.getWorldVec3(this.worldObj, posX, posY, posZ);
 
             // 射线检测
             MovingObjectPosition hitResult = null;
@@ -96,9 +104,9 @@ public class MCH_LaserGuidanceSystem implements MCH_IGuidanceSystem {
             for (int i = 1; i <= numSegments; i++) {
                 // 计算当前分段的目标点，确保每段都从上一个段的终点开始
                 Vec3 currentDst = W_WorldFunc.getWorldVec3(this.worldObj,
-                        RenderManager.renderPosX + targetX * i / numSegments,
-                        RenderManager.renderPosY + 1.62D + targetY * i / numSegments,
-                        RenderManager.renderPosZ + targetZ * i / numSegments);
+                        posX + targetX * i / numSegments,
+                        posY + targetY * i / numSegments,
+                        posZ + targetZ * i / numSegments);
 
                 // 执行射线检测
                 List<MovingObjectPosition> hitResults = rayTraceAllBlocks(this.worldObj, src, currentDst, false, true, true);

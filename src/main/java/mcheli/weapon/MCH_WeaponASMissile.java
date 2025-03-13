@@ -60,7 +60,7 @@ public class MCH_WeaponASMissile extends MCH_WeaponBase {
       targetZ = targetZ * maxDist / dist;
 
       // 计算发射源
-      Vec3 src = W_WorldFunc.getWorldVec3(this.worldObj, params.entity.posX, params.entity.posY + 1.62D, params.entity.posZ);
+      Vec3 src = W_WorldFunc.getWorldVec3(this.worldObj, params.entity.posX, params.entity.posY + params.entity.getEyeHeight(), params.entity.posZ);
 
       // 射线检测
       MovingObjectPosition hitResult = null;
@@ -69,7 +69,7 @@ public class MCH_WeaponASMissile extends MCH_WeaponBase {
          // 计算当前分段的目标点，确保每段都从上一个段的终点开始
          Vec3 currentDst = W_WorldFunc.getWorldVec3(this.worldObj,
                  params.entity.posX + targetX * i / numSegments,
-                 params.entity.posY + 1.62D + targetY * i / numSegments,
+                 params.entity.posY + params.entity.getEyeHeight() + targetY * i / numSegments,
                  params.entity.posZ + targetZ * i / numSegments);
 
          // 执行射线检测

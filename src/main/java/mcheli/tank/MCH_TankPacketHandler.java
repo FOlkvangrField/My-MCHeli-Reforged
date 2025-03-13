@@ -101,6 +101,10 @@ public class MCH_TankPacketHandler {
                   tank.useMaintenance();
                }
 
+               if(pc.useAPS) {
+                  tank.useAPS(player);
+               }
+
                if(pc.openGui) {
                   tank.openGui(player);
                }

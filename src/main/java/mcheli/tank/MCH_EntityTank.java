@@ -415,6 +415,14 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
    }
 
    protected void onUpdate_Control(float partialTicks) {
+
+      if(getHP() * 100 / getMaxHP() < getAcInfo().engineShutdownThreshold) {
+         setCurrentThrottle(0);
+         throttleUp = false;
+         throttleBack = 0;
+         return;
+      }
+
       if(super.isGunnerMode && !this.canUseFuel()) {
          this.switchGunnerMode(false);
       }
@@ -462,6 +470,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
    }
 
    protected void onUpdate_ControlSub(float partialTicks) {
+
       if(!super.isGunnerMode) {
          float throttleUpDown = this.getAcInfo().throttleUpDown;
          if(super.throttleUp) {
@@ -771,6 +780,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
    public void applyOnGroundPitch(float factor) {}
 
    private void onUpdate_Server() {
+
       //todo gear shifts here
       Entity rdnEnt = this.getRiddenByEntity();
       double prevMotion = Math.sqrt(super.motionX * super.motionX + super.motionZ * super.motionZ);
@@ -805,6 +815,7 @@ public class MCH_EntityTank extends MCH_EntityAircraft {
       }
 
       float throttle = (float)(this.getCurrentThrottle() / 10.0D);
+
       Vec3 v = MCH_Lib.Rot2Vec3(this.getRotYaw(), this.getRotPitch() - 10.0F);
       if(!levelOff) {
          super.motionY += v.yCoord * (double)throttle / 8.0D;

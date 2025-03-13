@@ -46,12 +46,20 @@ public class MCH_RenderLockBox extends W_Render {
             double lockPosY = guidanceSystem.getLockPosY();
             double lockPosZ = guidanceSystem.getLockPosZ();
 
-            RenderManager rm = RenderManager.instance;
-            double distance = Math.sqrt(Math.pow(lockPosX - RenderManager.renderPosX, 2) + Math.pow(lockPosY - RenderManager.renderPosY, 2) + Math.pow(lockPosZ - RenderManager.renderPosZ, 2));
+//            double posX = player.posX;
+//            double posY = player.posY + player.getEyeHeight();
+//            double posZ = player.posZ;
 
-            double x = lockPosX - RenderManager.renderPosX;
-            double y = lockPosY - RenderManager.renderPosY;
-            double z = lockPosZ - RenderManager.renderPosZ;
+            double posX = RenderManager.renderPosX;
+            double posY = RenderManager.renderPosY;
+            double posZ = RenderManager.renderPosZ;
+
+            RenderManager rm = RenderManager.instance;
+            double distance = Math.sqrt(Math.pow(lockPosX - posX, 2) + Math.pow(lockPosY - posY, 2) + Math.pow(lockPosZ - posZ, 2));
+
+            double x = lockPosX - posX;
+            double y = lockPosY - posY;
+            double z = lockPosZ - posZ;
 
             if(distance > 1000) return;
 

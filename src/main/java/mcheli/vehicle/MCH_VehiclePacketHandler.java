@@ -62,6 +62,10 @@ public class MCH_VehiclePacketHandler {
                   vehicle.useMaintenance();
                }
 
+               if(pc.useAPS) {
+                  vehicle.useAPS(player);
+               }
+
                if(pc.unhitchChainId >= 0) {
                   Entity e1 = player.worldObj.getEntityByID(pc.unhitchChainId);
                   if(e1 instanceof MCH_EntityChain) {

@@ -941,7 +941,9 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
 //                        m.hitVec.zCoord + ((double)super.rand.nextFloat() - 0.5D) * (double)p / 10.0D,
 //                        -super.motionX * (double)p / 2.0D, (double)(p / 2.0F), -super.motionZ * (double)p / 2.0D);
 //            }
-            spawnBlockPar(m, m.blockX, m.blockY, m.blockZ);
+            if(m.entityHit == null) {
+                spawnBlockPar(m, m.blockX, m.blockY, m.blockZ);
+            }
         }
 
     }

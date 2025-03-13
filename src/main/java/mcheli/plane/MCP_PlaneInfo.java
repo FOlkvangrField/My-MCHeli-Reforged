@@ -30,7 +30,7 @@ public class MCP_PlaneInfo extends MCH_AircraftInfo {
    public MCP_PlaneInfo(String name) {
       super(name);
       this.sweepWingSpeed = super.speed;
-      this.motionFactor = 0.99F;
+      this.motionFactor = 0.975F;
    }
 
    public float getDefaultRotorSpeed() {
@@ -54,7 +54,7 @@ public class MCP_PlaneInfo extends MCH_AircraftInfo {
    }
 
    public float getMaxSpeed() {
-      return 4F;
+      return 4.0F;
    }
 
    public int getDefaultMaxZoom() {

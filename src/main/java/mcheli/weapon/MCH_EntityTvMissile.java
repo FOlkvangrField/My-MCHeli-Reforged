@@ -126,8 +126,22 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
             targetY = targetY * maxDist / dist;
             targetZ = targetZ * maxDist / dist;
 
+            double posX;
+            double posY;
+            double posZ;
+
+            if (worldObj.isRemote) {
+                posX = e.posX;
+                posY = e.posY + e.getEyeHeight();
+                posZ = e.posZ;
+            } else {
+                posX = RenderManager.renderPosX;
+                posY = RenderManager.renderPosY;
+                posZ = RenderManager.renderPosZ;
+            }
+
             // 计算发射源
-            Vec3 src = W_WorldFunc.getWorldVec3(this.worldObj, e.posX, e.posY, e.posZ);
+            Vec3 src = W_WorldFunc.getWorldVec3(this.worldObj, posX, posY, posZ);
 
             // 射线检测
             MovingObjectPosition hitResult = null;
@@ -135,9 +149,9 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
             for (int i = 1; i <= numSegments; i++) {
                 // 计算当前分段的目标点，确保每段都从上一个段的终点开始
                 Vec3 currentDst = W_WorldFunc.getWorldVec3(this.worldObj,
-                        e.posX + targetX * i / numSegments,
-                        e.posY + 1.62D + targetY * i / numSegments,
-                        e.posZ + targetZ * i / numSegments);
+                        posX + targetX * i / numSegments,
+                        posY + targetY * i / numSegments,
+                        posZ + targetZ * i / numSegments);
 
                 // 执行射线检测
                 List<MovingObjectPosition> hitResults = rayTraceAllBlocks(this.worldObj, src, currentDst, false, true, true);
