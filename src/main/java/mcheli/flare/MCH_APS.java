@@ -47,14 +47,24 @@ public class MCH_APS {
                 tick = waitTime;
                 useTick = useTime;
                 result = true;
-                W_WorldFunc.MOD_playSoundEffect(worldObj, aircraft.posX, aircraft.posY, aircraft.posZ, "aps_activate", 10.0F, 1.0F);
+                if(range == 100) {
+                    W_WorldFunc.MOD_playSoundEffect(worldObj, aircraft.posX, aircraft.posY, aircraft.posZ, "iron_curtain", 10.0F, 1.0F);
+                    aircraft.ironCurtainRunningTick = useTick;
+                } else {
+                    W_WorldFunc.MOD_playSoundEffect(worldObj, aircraft.posX, aircraft.posY, aircraft.posZ, "aps_activate", 10.0F, 1.0F);
+                }
             }
         } else {
             result = true;
             tick = waitTime;
             useTick = useTime;
             aircraft.getEntityData().setBoolean("APSUsing", true);
-            W_WorldFunc.MOD_playSoundEffect(worldObj, aircraft.posX, aircraft.posY, aircraft.posZ, "aps_activate", 10.0F, 1.0F);
+            if(range == 100) {
+                W_WorldFunc.MOD_playSoundEffect(worldObj, aircraft.posX, aircraft.posY, aircraft.posZ, "iron_curtain", 10.0F, 1.0F);
+                aircraft.ironCurtainRunningTick = useTick;
+            } else {
+                W_WorldFunc.MOD_playSoundEffect(worldObj, aircraft.posX, aircraft.posY, aircraft.posZ, "aps_activate", 10.0F, 1.0F);
+            }
         }
         return result;
     }
@@ -68,6 +78,7 @@ public class MCH_APS {
                 --this.useTick;
                 if(useTick == 0) {
                     W_WorldFunc.MOD_playSoundEffect(worldObj, aircraft.posX, aircraft.posY, aircraft.posZ, "aps_deactivate", 10.0F, 1.0F);
+                    onEnd();
                 }
             }
             if(this.useTick > 0) {
@@ -80,8 +91,26 @@ public class MCH_APS {
     }
 
     private void onUsing() {
+        if(range == 100) {
+            if (aircraft.ironCurtainRunningTick > 0) {
+                aircraft.ironCurtainRunningTick--;
+                //每tick更新波动因子
+                aircraft.ironCurtainWaveTimer++;
+                aircraft.ironCurtainLastFactor = aircraft.ironCurtainCurrentFactor;
+                //基于计时器生成波动曲线（0.5~1.0）
+                float waveSpeed = 0.25f;
+                aircraft.ironCurtainCurrentFactor = 0.75f + 0.25f * (float) Math.sin(aircraft.ironCurtainWaveTimer * waveSpeed);
+            } else {
+                aircraft.ironCurtainWaveTimer = 0;
+                aircraft.ironCurtainCurrentFactor = 0.5f;
+                aircraft.ironCurtainLastFactor = 0.5f;
+            }
+        }
         if(worldObj.isRemote) {
         } else {
+            if(range == 100) {
+                return;
+            }
             List list = worldObj.getEntitiesWithinAABBExcludingEntity(aircraft, aircraft.boundingBox.expand(range, range, range));
             for (Object obj : list) {
                 Entity entity = (Entity) obj;
@@ -120,6 +149,14 @@ public class MCH_APS {
         }
     }
 
+    private void onEnd() {
+        if(range == 100) {
+            aircraft.ironCurtainRunningTick = 0;
+            aircraft.ironCurtainWaveTimer = 0;
+            aircraft.ironCurtainCurrentFactor = 0.5f;
+            aircraft.ironCurtainLastFactor = 0.5f;
+        }
+    }
 
     public boolean isInPreparation() {
         return this.tick != 0;

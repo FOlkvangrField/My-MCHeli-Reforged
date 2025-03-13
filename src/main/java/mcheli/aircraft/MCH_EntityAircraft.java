@@ -229,6 +229,11 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
    public MCH_Maintenance maintenance;
    public MCH_APS aps;
 
+   public int ironCurtainRunningTick = 0;
+   public float ironCurtainLastFactor = 0.5f;
+   public float ironCurtainCurrentFactor = 0.5f;
+   public int ironCurtainWaveTimer = 0;
+
    public MCH_EntityAircraft(World world) {
       super(world);
       this.setAcInfo(null);
@@ -878,6 +883,9 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
 //
       //}
 
+      if(ironCurtainRunningTick > 0) {
+         return false;
+      }
 
       //System.out.println("the damage source is " + damageSource.getDamageType());
       //System.out.println("org damage: " + org_damage);

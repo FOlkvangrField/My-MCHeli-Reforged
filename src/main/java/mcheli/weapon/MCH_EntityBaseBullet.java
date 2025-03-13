@@ -27,6 +27,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EntityCloudFX;
 import net.minecraft.client.particle.EntityDiggingFX;
 import net.minecraft.client.particle.EntityFX;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -39,6 +41,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
+import org.lwjgl.opengl.GL11;
 
 public abstract class MCH_EntityBaseBullet extends W_Entity {
 
@@ -944,8 +947,75 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
             if(m.entityHit == null) {
                 spawnBlockPar(m, m.blockX, m.blockY, m.blockZ);
             }
+
+            if(m.entityHit instanceof MCH_EntityAircraft) {
+                MCH_EntityAircraft ac = (MCH_EntityAircraft) m.entityHit;
+                if(ac.ironCurtainRunningTick > 0) {
+                    spawnIronCurtainParticle(m, m.blockX, m.blockY, m.blockZ);
+                }
+            }
         }
 
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void spawnIronCurtainParticle(MovingObjectPosition raytraceResult, int xTile, int yTile, int zTile) {
+        // 定义暗红色参数（RGB：0.5, 0.1, 0.1）
+        final float DARK_RED_R = 0.5f;
+        final float DARK_RED_G = 0.1f;
+        final float DARK_RED_B = 0.1f;
+
+        int num = getInfo().flakParticlesCrack + rand.nextInt(3);
+        float scale = 1.0F;
+        for (int i = 0; i < num; i++) {
+            EntityDiggingFX fx = new EntityDiggingFX(
+                    this.worldObj,
+                    raytraceResult.hitVec.xCoord + (rand.nextFloat() - 0.5D) * width,
+                    raytraceResult.hitVec.yCoord + 0.1D,
+                    raytraceResult.hitVec.zCoord + (rand.nextFloat() - 0.5D) * width,
+                    0, 0, 0,
+                    worldObj.getBlock(xTile, yTile, zTile),
+                    this.worldObj.getBlockMetadata(xTile, yTile, zTile)
+            );
+
+            // 覆盖原有颜色设置
+            fx.setRBGColorF(DARK_RED_R, DARK_RED_G, DARK_RED_B); // 强制设置为暗红色
+            fx.multipleParticleScaleBy(scale * 0.8f); // 适当缩小粒子尺寸
+
+            // 调整运动参数
+            fx.motionX += getInfo().flakParticlesDiff * (rand.nextGaussian() * 0.5);
+            fx.motionZ += getInfo().flakParticlesDiff * (rand.nextGaussian() * 0.5);
+            fx.motionY += getInfo().flakParticlesDiff * Math.abs(rand.nextGaussian());
+
+            Minecraft.getMinecraft().effectRenderer.addEffect(fx);
+        }
+
+        for (int i = 0; i < 50 + getInfo().flakParticlesDiff; i++) {
+            EntityCloudFX obj = new EntityCloudFX(
+                    worldObj,
+                    raytraceResult.hitVec.xCoord + (rand.nextFloat() - 0.5D) * width,
+                    raytraceResult.hitVec.yCoord + rand.nextGaussian() * height,
+                    raytraceResult.hitVec.zCoord + (rand.nextFloat() - 0.5D) * width,
+                    0D, 0D, 0D
+            ) {
+                // 重写渲染方法确保颜色固定
+                @Override
+                public void renderParticle(Tessellator tessellator, float partialTicks,
+                                           float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+                    GL11.glColor4f(DARK_RED_R, DARK_RED_G, DARK_RED_B, 1.0f);
+                    super.renderParticle(tessellator, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+                }
+            };
+
+            // 设置粒子参数
+            obj.setRBGColorF(DARK_RED_R, DARK_RED_G, DARK_RED_B);
+            obj.motionX = rand.nextGaussian() / 100; // 增加运动速度
+            obj.motionY = rand.nextGaussian() / 100;
+            obj.motionZ = rand.nextGaussian() / 100;
+            obj.renderDistanceWeight = 350D; // 增加可见距离
+
+            FMLClientHandler.instance().getClient().effectRenderer.addEffect(obj);
+        }
     }
 
     @SideOnly(Side.CLIENT)
