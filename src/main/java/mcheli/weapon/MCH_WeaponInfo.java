@@ -247,6 +247,10 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
      * 速度是否跟随载机，最终速度 = 载机速度 + 子弹速度
      */
     public boolean speedDependsAircraft = false;
+    /**
+     * 是否可以锁定导弹实体
+     */
+    public boolean canLockMissile = false;
 
     public MCH_WeaponInfo(String name) {
         this.name = name;
@@ -510,6 +514,8 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
                 this.speedFactorEndTick = this.toInt(data);
             } else if (item.equalsIgnoreCase("SpeedDependsAircraft")) {
                 this.speedDependsAircraft = this.toBool(data);
+            } else if (item.equalsIgnoreCase("CanLockMissile")) {
+                this.canLockMissile = this.toBool(data);
             }
 
             else if (item.compareTo("reloadtime") == 0) {

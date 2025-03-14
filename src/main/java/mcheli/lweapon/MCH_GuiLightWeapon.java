@@ -189,6 +189,11 @@ public class MCH_GuiLightWeapon extends MCH_Gui {
          double sx = MCH_Lib.RNG(cx, left + IX, right - IX);
          double sy = MCH_Lib.RNG(cy, top + IY, bottom - IY);
          if(gs.getLockCount() >= gs.getLockCountMax() / 2) {
+//            Minecraft.getMinecraft().fontRenderer.drawString(
+//                    String.format("[%.1f,%.1f]", cx, cy),
+//                    (int) (cx + 10), (int) cy,
+//                    0xFFFFFF
+//            );
             this.drawLine(new double[]{-1.0D, sy, (double)(super.width + 1), sy, sx, -1.0D, sx, (double)(super.height + 1)}, -1593835521);
          }
 

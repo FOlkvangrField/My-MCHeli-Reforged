@@ -551,6 +551,7 @@ public class MCH_ClientProxy extends MCH_CommonProxy {
    public void init() {
       MinecraftForge.EVENT_BUS.register(new MCH_ParticlesUtil());
       MinecraftForge.EVENT_BUS.register(new MCH_ClientEventHook());
+      MinecraftForge.EVENT_BUS.register(new MCH_RenderBVRLockBox());
    }
 
    public void setCreativeDigDelay(int n) {
