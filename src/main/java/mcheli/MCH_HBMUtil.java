@@ -1,5 +1,6 @@
 package mcheli;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 
 import java.lang.reflect.Constructor;
@@ -58,10 +59,18 @@ public class MCH_HBMUtil {
         }
     }
 
-    public static void ExplosionCreator_composeEffectStandard(World world, double posX, double posY, double posZ) {
+    public static void ExplosionCreator_composeEffectStandard(World world, double posX, double posY, double posZ, int explosionPower) {
         try {
             if (explosionCreatorClass != null) {
-                Method spawnChlorineMethod = explosionCreatorClass.getMethod("composeEffectStandard", World.class, double.class, double.class, double.class);
+                Method spawnChlorineMethod;
+                if(explosionPower<10) {
+                    spawnChlorineMethod = explosionCreatorClass.getMethod("composeEffectSmall", World.class, double.class, double.class, double.class);
+                } else if (explosionPower<20) {
+                    spawnChlorineMethod = explosionCreatorClass.getMethod("composeEffectStandard", World.class, double.class, double.class, double.class);
+                }
+                else {
+                    spawnChlorineMethod = explosionCreatorClass.getMethod("composeEffectLarge", World.class, double.class, double.class, double.class);
+                }
                 spawnChlorineMethod.invoke(null, world, posX, posY, posZ);
             }
         } catch (Exception e) {
@@ -69,10 +78,10 @@ public class MCH_HBMUtil {
         }
     }
 
-    public static Object ExplosionNT_instance_init(World world, Object entity, double posX, double posY, double posZ, float explosionPower) {
+    public static Object ExplosionNT_instance_init(World world, Entity entity, double posX, double posY, double posZ, float explosionPower) {
         try {
             if (explosionNT != null) {
-                Class<?>[] explosionNTParamTypes = {World.class, Object.class, double.class, double.class, double.class, float.class};
+                Class<?>[] explosionNTParamTypes = {World.class, Entity.class, double.class, double.class, double.class, float.class};
                 Constructor<?> explosionNTConstructor = explosionNT.getConstructor(explosionNTParamTypes);
                 return explosionNTConstructor.newInstance(world, entity, posX, posY, posZ, explosionPower);
             }
