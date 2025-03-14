@@ -231,6 +231,23 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
      */
     public float recoilRecoverFactor = 0.8F;
 
+    /**
+     * 每tick速度增加数值，小于0减速，大于0加速
+     */
+    public float speedFactor = 0F;
+    /**
+     * 每tick的速度乘数生效时长
+     */
+    public int speedFactorStartTick = 0;
+    /**
+     * 每tick的速度乘数结束时长
+     */
+    public int speedFactorEndTick = 0;
+    /**
+     * 速度是否跟随载机，最终速度 = 载机速度 + 子弹速度
+     */
+    public boolean speedDependsAircraft = false;
+
     public MCH_WeaponInfo(String name) {
         this.name = name;
         this.displayName = name;
@@ -485,6 +502,14 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
                 this.recoilYawRange = this.toFloat(data);
             } else if (item.equalsIgnoreCase("RecoilRecoverFactor")) {
                 this.recoilRecoverFactor = this.toFloat(data);
+            } else if (item.equalsIgnoreCase("SpeedFactor")) {
+                this.speedFactor = this.toFloat(data);
+            } else if (item.equalsIgnoreCase("SpeedFactorStartTick")) {
+                this.speedFactorStartTick = this.toInt(data);
+            } else if (item.equalsIgnoreCase("SpeedFactorEndTick")) {
+                this.speedFactorEndTick = this.toInt(data);
+            } else if (item.equalsIgnoreCase("SpeedDependsAircraft")) {
+                this.speedDependsAircraft = this.toBool(data);
             }
 
             else if (item.compareTo("reloadtime") == 0) {

@@ -3,11 +3,6 @@ package mcheli.weapon;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import mcheli.*;
 import mcheli.aircraft.MCH_EntityAircraft;
 import mcheli.aircraft.MCH_EntityHitBox;
@@ -27,21 +22,20 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EntityCloudFX;
 import net.minecraft.client.particle.EntityDiggingFX;
 import net.minecraft.client.particle.EntityFX;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
 import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public abstract class MCH_EntityBaseBullet extends W_Entity {
 
@@ -74,7 +68,7 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
     public double prevMotionZ;
     public int antiFlareTick;
     boolean doingTopAttack = false;
-
+    boolean speedAddedFromAircraft = false;
     private ForgeChunkManager.Ticket chunkLoaderTicket;
     private List<ChunkCoordIntPair> loadedChunks = new ArrayList<>();
 
@@ -113,8 +107,7 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
         if(acceleration > 3.9D) {
             acceleration = 3.9D;
         }
-
-        double d = (double)MathHelper.sqrt_double(mx * mx + my * my + mz * mz);
+        double d = MathHelper.sqrt_double(mx * mx + my * my + mz * mz);
         super.motionX = mx * acceleration / d;
         super.motionY = my * acceleration / d;
         super.motionZ = mz * acceleration / d;
@@ -413,13 +406,6 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
         this.shootingEntity = user;
     }
 
-    public void setMotion(double targetX, double targetY, double targetZ) {
-        double d6 = (double)MathHelper.sqrt_double(targetX * targetX + targetY * targetY + targetZ * targetZ);
-        super.motionX = targetX * this.acceleration / d6;
-        super.motionY = targetY * this.acceleration / d6;
-        super.motionZ = targetZ * this.acceleration / d6;
-    }
-
     public void guidanceToTarget(double targetPosX, double targetPosY, double targetPosZ) {
         this.guidanceToTarget(targetPosX, targetPosY, targetPosZ, 1.0F);
     }
@@ -523,6 +509,20 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
 
     public void onUpdate() {
 
+        if(!worldObj.isRemote) {
+            if (shootingAircraft instanceof MCH_EntityAircraft && !speedAddedFromAircraft && getInfo().speedDependsAircraft) {
+                MCH_EntityAircraft ac = (MCH_EntityAircraft) shootingAircraft;
+                double s = Math.sqrt(ac.motionX * ac.motionX + ac.motionY * ac.motionY + ac.motionZ * ac.motionZ);
+                acceleration += s;
+                double d = MathHelper.sqrt_double(motionX * motionX + motionY * motionY + motionZ * motionZ);
+                super.motionX = motionX * acceleration / d;
+                super.motionY = motionY * acceleration / d;
+                super.motionZ = motionZ * acceleration / d;
+                System.out.println("更新子弹速度 + " + s);
+                speedAddedFromAircraft = true;
+            }
+        }
+
         if(getInfo() != null && getInfo().enableChunkLoader) {
             checkAndLoadChunks();
         }
@@ -610,9 +610,29 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
         }
 
         if(!this.isInWater()) {
-            super.motionY += (double)this.getGravity();
+            if(ticksExisted > getInfo().speedFactorStartTick && ticksExisted < getInfo().speedFactorEndTick) {
+                // 计算当前总速度
+                double currentSpeed = Math.sqrt(
+                        motionX * motionX +
+                                motionY * motionY +
+                                motionZ * motionZ
+                );
+
+                if(currentSpeed > 0) { // 避免除以零
+                    // 获取速度方向单位向量
+                    double dirX = motionX / currentSpeed;
+                    double dirY = motionY / currentSpeed;
+                    double dirZ = motionZ / currentSpeed;
+
+                    // 沿速度方向叠加固定增量
+                    motionX += dirX * getInfo().speedFactor;
+                    motionY += dirY * getInfo().speedFactor;
+                    motionZ += dirZ * getInfo().speedFactor;
+                }
+            }
+            super.motionY += this.getGravity();
         } else {
-            super.motionY += (double)this.getGravityInWater();
+            super.motionY += this.getGravityInWater();
         }
 
         if(!super.isDead) {

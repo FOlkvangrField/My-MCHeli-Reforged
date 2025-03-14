@@ -1697,27 +1697,27 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
             }
 
             if(this.getTowChainEntity() != null && this.getTowChainEntity().towedEntity != null) {
-               this.noCollisionEntities.put(this.getTowChainEntity().towedEntity, Integer.valueOf(60));
+               this.noCollisionEntities.put(this.getTowChainEntity().towedEntity, 60);
             }
 
             if(this.getTowedChainEntity() != null && this.getTowedChainEntity().towEntity != null) {
-               this.noCollisionEntities.put(this.getTowedChainEntity().towEntity, Integer.valueOf(60));
+               this.noCollisionEntities.put(this.getTowedChainEntity().towEntity, 60);
             }
 
             if(super.ridingEntity instanceof MCH_EntitySeat) {
                MCH_EntityAircraft var3 = ((MCH_EntitySeat)super.ridingEntity).getParent();
                if(var3 != null) {
-                  this.noCollisionEntities.put(var3, Integer.valueOf(60));
+                  this.noCollisionEntities.put(var3, 60);
                }
             } else if(super.ridingEntity != null) {
-               this.noCollisionEntities.put(super.ridingEntity, Integer.valueOf(60));
+               this.noCollisionEntities.put(super.ridingEntity, 60);
             }
 
             Iterator var4 = this.noCollisionEntities.keySet().iterator();
 
             while(var4.hasNext()) {
                key1 = (Entity)var4.next();
-               this.noCollisionEntities.put(key1, Integer.valueOf(((Integer)this.noCollisionEntities.get(key1)).intValue() - 1));
+               this.noCollisionEntities.put(key1, (Integer) this.noCollisionEntities.get(key1) - 1);
             }
 
             var4 = this.noCollisionEntities.values().iterator();

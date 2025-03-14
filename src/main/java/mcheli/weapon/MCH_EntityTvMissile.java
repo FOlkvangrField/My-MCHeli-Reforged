@@ -36,6 +36,13 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
         super(par1World, posX, posY, posZ, targetX, targetY, targetZ, yaw, pitch, acceleration);
     }
 
+    public void setMotion(double targetX, double targetY, double targetZ) {
+        double d6 = (double)MathHelper.sqrt_double(targetX * targetX + targetY * targetY + targetZ * targetZ);
+        super.motionX = targetX * this.acceleration / d6;
+        super.motionY = targetY * this.acceleration / d6;
+        super.motionZ = targetZ * this.acceleration / d6;
+    }
+
     public void onUpdate() {
         super.onUpdate();
         this.onUpdateBomblet();
