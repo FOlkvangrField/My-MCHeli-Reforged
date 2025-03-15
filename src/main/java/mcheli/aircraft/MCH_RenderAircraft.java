@@ -1106,6 +1106,7 @@ public abstract class MCH_RenderAircraft extends W_Render {
             if(ac != null) {
                if(!W_Entity.isEqual(ac, entity)) {
                   MCH_IGuidanceSystem guidanceSystem = ac.getCurrentWeapon(player).getCurrentWeapon().getGuidanceSystem();
+                  MCH_WeaponInfo wi = ac.getCurrentWeapon(player).getCurrentWeapon().getInfo();
                   if(guidanceSystem == null) {
                      return;
                   }
@@ -1118,6 +1119,9 @@ public abstract class MCH_RenderAircraft extends W_Render {
                         // 计算目标实体与玩家之间的平方距离
                         double dist = entity.getDistanceSqToEntity(rm.livingPlayer);
                         double distance = Math.sqrt(dist);
+                        if(wi != null && wi.enableBVR && distance > wi.minRangeBVR) {
+                           return;
+                        }
 //                     if(entity instanceof MCH_EntityFlare) {
 //                        long worldTime = Minecraft.getMinecraft().theWorld.getTotalWorldTime();
 //                        float blinkBaseFrequency = 1.0F; // 基本闪烁频率（每秒闪烁一次）
@@ -1127,7 +1131,6 @@ public abstract class MCH_RenderAircraft extends W_Render {
 //                        boolean isFlareVisible = sinValue > 0.0F; // 通过正弦波的值来决定是否显示框
 //                        if(!isFlareVisible) return;
 //                     }
-
                         Vec3 src = Vec3.createVectorHelper(RenderManager.renderPosX, RenderManager.renderPosY, RenderManager.renderPosZ);
                         Vec3 dst = Vec3.createVectorHelper(entity.posX, entity.posY, entity.posZ);
                         MovingObjectPosition mop = player.worldObj.rayTraceBlocks(src, dst, true);

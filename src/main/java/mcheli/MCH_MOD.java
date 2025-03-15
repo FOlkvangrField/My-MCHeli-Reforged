@@ -130,6 +130,7 @@ public class MCH_MOD {
    public static MCH_DraftingTableBlock blockDraftingTableLit;
    public static Item sampleHelmet;
    public static final PacketHandler newPacketHandler = new PacketHandler();
+   public static final MCH_EntityInfoManager entityInfoManager = new MCH_EntityInfoManager();
 
    public static PacketHandler getPacketHandler() {
       return newPacketHandler;

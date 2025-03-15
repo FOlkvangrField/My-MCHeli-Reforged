@@ -1,13 +1,12 @@
-package mcheli.weapon;
+package mcheli;
 
 import net.minecraft.client.renderer.ActiveRenderInfo;
 
 import java.lang.reflect.Field;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 
-public class MCH_RenderUtil {
+public class MCH_ActiveRenderInfoHolder {
 
     public static IntBuffer viewport;
     public static FloatBuffer modelview;

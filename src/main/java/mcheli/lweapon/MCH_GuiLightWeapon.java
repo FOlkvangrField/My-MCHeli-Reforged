@@ -9,8 +9,6 @@ import mcheli.MCH_MOD;
 import mcheli.aircraft.MCH_EntityAircraft;
 import mcheli.gltd.MCH_EntityGLTD;
 import mcheli.gui.MCH_Gui;
-import mcheli.lweapon.MCH_ClientLightWeaponTickHandler;
-import mcheli.lweapon.MCH_ItemLightWeaponBase;
 import mcheli.weapon.MCH_WeaponGuidanceSystem;
 import mcheli.wrapper.W_McClient;
 import net.minecraft.client.Minecraft;
@@ -21,6 +19,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.Vec3;
 import org.lwjgl.opengl.GL11;
+
 
 @SideOnly(Side.CLIENT)
 public class MCH_GuiLightWeapon extends MCH_Gui {
@@ -176,6 +175,7 @@ public class MCH_GuiLightWeapon extends MCH_Gui {
       double right = left + (double)size;
       double bottom = top + (double)size;
       Vec3 pos = MCH_ClientLightWeaponTickHandler.getMartEntityPos();
+
       if(gs.getLockCount() > 0) {
          int x = MCH_Gui.scaleFactor > 0?MCH_Gui.scaleFactor:2;
          if(pos == null) {

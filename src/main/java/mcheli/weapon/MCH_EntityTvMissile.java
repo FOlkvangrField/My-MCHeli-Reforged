@@ -1,5 +1,7 @@
 package mcheli.weapon;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import mcheli.MCH_Lib;
 import mcheli.aircraft.MCH_EntityAircraft;
 import mcheli.aircraft.MCH_EntitySeat;
@@ -137,14 +139,14 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
             double posY;
             double posZ;
 
-            if (worldObj.isRemote) {
+            if (!worldObj.isRemote) {
                 posX = e.posX;
                 posY = e.posY + e.getEyeHeight();
                 posZ = e.posZ;
             } else {
-                posX = RenderManager.renderPosX;
-                posY = RenderManager.renderPosY;
-                posZ = RenderManager.renderPosZ;
+                posX = clientTarget().xCoord;
+                posY = clientTarget().yCoord;
+                posZ = clientTarget().zCoord;
             }
 
             // 计算发射源
@@ -187,6 +189,11 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
 
             onLaserGuide();
         }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private Vec3 clientTarget() {
+        return Vec3.createVectorHelper(RenderManager.renderPosX, RenderManager.renderPosY, RenderManager.renderPosZ);
     }
 
     public void onLaserGuide() {

@@ -251,6 +251,14 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
      * 是否可以锁定导弹实体
      */
     public boolean canLockMissile = false;
+    /**
+     * 允许超视距索敌
+     */
+    public boolean enableBVR = false;
+    /**
+     * 超视距索敌功能最小启用距离
+     */
+    public int minRangeBVR = 300;
 
     public MCH_WeaponInfo(String name) {
         this.name = name;
@@ -516,6 +524,10 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
                 this.speedDependsAircraft = this.toBool(data);
             } else if (item.equalsIgnoreCase("CanLockMissile")) {
                 this.canLockMissile = this.toBool(data);
+            } else if (item.equalsIgnoreCase("EnableBVR")) {
+                this.enableBVR = this.toBool(data);
+            } else if (item.equalsIgnoreCase("MinRangeBVR")) {
+                this.minRangeBVR = this.toInt(data);
             }
 
             else if (item.compareTo("reloadtime") == 0) {
