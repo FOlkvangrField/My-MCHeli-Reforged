@@ -3,7 +3,10 @@ package mcheli;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
-import mcheli.network.packets.PacketEntitySync;
+import mcheli.flare.MCH_EntityChaff;
+import mcheli.helicopter.MCH_EntityHeli;
+import mcheli.network.packets.PacketEntityInfoSync;
+import mcheli.plane.MCP_EntityPlane;
 import mcheli.weapon.MCH_IEntityLockChecker;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,7 +16,7 @@ import net.minecraft.world.WorldServer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static mcheli.network.packets.PacketEntitySync.*;
+import static mcheli.network.packets.PacketEntityInfoSync.*;
 
 public class MCH_EntityInfoManager {
 
@@ -38,7 +41,7 @@ public class MCH_EntityInfoManager {
         //更新实体到集合
         for (WorldServer world : MinecraftServer.getServer().worldServers) {
             for (Entity entity : (List<Entity>) world.loadedEntityList) {
-                if (shouldTrack(entity)) {
+                if (shouldTrack(world, entity)) {
                     serverEntities.put(entity.getEntityId(), MCH_EntityInfo.createInfo(entity));
                 }
             }
@@ -52,7 +55,7 @@ public class MCH_EntityInfoManager {
                 Map.Entry<Integer, MCH_EntityInfo> entry = it.next();
                 MCH_EntityInfo info = entry.getValue();
                 Entity entity = serverGetEntity(info.entityId);
-                if (entity == null || entity.isDead) {
+                if (entity == null || entity.isDead || System.currentTimeMillis() - info.lastUpdateTime > 5 * 1000L) {
                     removed.add(info);
                     it.remove();
                 }
@@ -81,13 +84,24 @@ public class MCH_EntityInfoManager {
         return null;
     }
 
-    private boolean shouldTrack(Entity entity) {
-        return entity instanceof EntityPlayer || entity instanceof MCH_IEntityLockChecker;
+    private boolean shouldTrack(WorldServer w, Entity entity) {
+        if(entity instanceof EntityPlayer || entity instanceof MCH_IEntityLockChecker) {
+            if (entity instanceof MCP_EntityPlane || entity instanceof MCH_EntityHeli || entity instanceof MCH_EntityChaff) {
+                if(entity.posY - w.getHeightValue((int) entity.posX, (int) entity.posZ) < 30) {
+                    return false;
+                }
+                if (entity.motionX * entity.motionX + entity.motionY * entity.motionY + entity.motionZ * entity.motionZ < 0.5 * 0.5) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     private void sendEntityPacket(List<MCH_EntityInfo> infos, byte operation) {
         if (!infos.isEmpty()) {
-            MCH_MOD.getPacketHandler().sendToAll(new PacketEntitySync(infos, operation));
+            MCH_MOD.getPacketHandler().sendToAll(new PacketEntityInfoSync(infos, operation));
         }
     }
 

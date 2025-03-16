@@ -1,6 +1,5 @@
 package mcheli.aircraft;
 
-import java.sql.SQLOutput;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -1247,7 +1246,7 @@ public abstract class MCH_RenderAircraft extends W_Render {
                               } else if (gs.isRadarMissile) {
                                  if (entity instanceof MCH_EntityAircraft) {
                                     MCH_EntityAircraft entityAircraft = (MCH_EntityAircraft) entity;
-                                    text = entityAircraft.getNameOnRadar(ac);
+                                    text = entityAircraft.getNameOnOtherRadar(ac);
                                  } else {
                                     text = "?";
                                  }

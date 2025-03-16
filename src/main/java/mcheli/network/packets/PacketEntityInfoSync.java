@@ -11,7 +11,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PacketEntitySync extends PacketBase {
+public class PacketEntityInfoSync extends PacketBase {
 
     public static final byte OPERATION_UPDATE = 0;
     public static final byte OPERATION_REMOVE = 1;
@@ -19,9 +19,9 @@ public class PacketEntitySync extends PacketBase {
     private List<MCH_EntityInfo> entities;
     private byte operation;
 
-    public PacketEntitySync() {}
+    public PacketEntityInfoSync() {}
 
-    public PacketEntitySync(List<MCH_EntityInfo> entities, byte operation) {
+    public PacketEntityInfoSync(List<MCH_EntityInfo> entities, byte operation) {
         this.entities = entities;
         this.operation = operation;
     }
@@ -34,6 +34,7 @@ public class PacketEntitySync extends PacketBase {
             // 编码实体信息
             buf.writeInt(info.entityId);
             writeUTF(buf, info.worldName);
+            writeUTF(buf, info.entityName);
             writeUTF(buf, info.entityClassName);
             buf.writeDouble(info.posX);
             buf.writeDouble(info.posY);
@@ -52,6 +53,7 @@ public class PacketEntitySync extends PacketBase {
         for (int i = 0; i < count; i++) {
             entities.add(new MCH_EntityInfo(
                 buf.readInt(),
+                readUTF(buf),
                 readUTF(buf),
                 readUTF(buf),
                 buf.readDouble(),

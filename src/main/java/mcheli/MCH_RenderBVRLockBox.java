@@ -61,7 +61,7 @@ public class MCH_RenderBVRLockBox {
         {
             List<MCH_EntityInfo> entities = new ArrayList<>(getServerLoadedEntity());
             for (MCH_EntityInfo entity : entities) {
-                if (shouldSkipEntity(entity, player, wi)) continue;
+                if (!canRenderEntity(entity, player, wi)) continue;
                 double x = interpolate(entity.posX, entity.lastTickPosX, event.partialTicks);
                 double y = interpolate(entity.posY, entity.lastTickPosY, event.partialTicks) + 1;
                 double z = interpolate(entity.posZ, entity.lastTickPosZ, event.partialTicks);
@@ -121,41 +121,24 @@ public class MCH_RenderBVRLockBox {
         return new ArrayList<>(MCH_EntityInfoClientTracker.getAllTrackedEntities());
     }
 
-    private boolean shouldSkipEntity(MCH_EntityInfo entity, EntityPlayer player, MCH_WeaponInfo wi) {
-//        if(!(entity instanceof MCH_EntityAircraft)) {
-//            return true;
-//        }
-//        if (!entity.worldName.equals(player.worldObj.getWorldInfo().getWorldName())) {
-//            return true;
-//        }
-
-        if (entity.entityClassName.contains("EntityPlayer")) {
+    private boolean canRenderEntity(MCH_EntityInfo entity, EntityPlayer player, MCH_WeaponInfo wi) {
+        boolean result = false;
+        if (entity.entityClassName.contains("MCP_EntityPlane")) {
+            if (entity.getDistanceSqToEntity(player) > wi.minRangeBVR * wi.minRangeBVR) {
+                return true;
+            }
+        } else if (entity.entityClassName.contains("MCH_EntityHeli")) {
+            if (entity.getDistanceSqToEntity(player) > wi.minRangeBVR * wi.minRangeBVR) {
+                return true;
+            }
+        } else if (entity.entityClassName.contains("MCH_EntityChaff") && wi.isRadarMissile) {
+            if (entity.getDistanceSqToEntity(player) > wi.minRangeBVR * wi.minRangeBVR) {
+                return true;
+            }
+        } else if (entity.entityClassName.contains("MCH_EntityAAMissile") && entity.getDistanceSqToEntity(player) > 100 * 100) {
             return true;
         }
-
-        if (entity.entityClassName.contains("MCH_EntityFlare") && !wi.isHeatSeekerMissile) {
-            return true;
-        }
-
-        if (entity.entityClassName.contains("MCH_EntityChaff") && !wi.isRadarMissile) {
-            return true;
-        }
-
-        if (!entity.entityClassName.contains("MCH_EntityAAMissile")
-                && entity.getDistanceSqToEntity(player) < wi.minRangeBVR * wi.minRangeBVR) {
-            return true;
-        }
-
-        if (entity.entityClassName.contains("MCH_EntityAAMissile")
-                && entity.getDistanceSqToEntity(player) < 100 * 100) {
-            return true;
-        }
-
-//        if(MCH_WeaponGuidanceSystem.isEntityOnGround(entity, wi.lockMinHeight)){
-//            return true;
-//        }
-
-        return false;
+        return result;
     }
 
     private double[] worldToScreen(Vector3f pos) {

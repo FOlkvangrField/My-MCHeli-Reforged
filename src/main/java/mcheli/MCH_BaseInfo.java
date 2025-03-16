@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import mcheli.aircraft.MCH_AircraftInfo;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.util.Vec3;
 

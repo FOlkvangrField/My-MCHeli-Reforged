@@ -12,7 +12,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
-import mcheli.network.packets.PacketEntitySync;
+import mcheli.network.packets.PacketEntityInfoSync;
 import mcheli.network.packets.PacketLaserGuidanceTargeting;
 import mcheli.network.packets.PacketLockTarget;
 import net.minecraft.client.Minecraft;
@@ -117,7 +117,7 @@ public class PacketHandler extends MessageToMessageCodec<FMLProxyPacket, PacketB
      */
     public void initialise() {
         channels = NetworkRegistry.INSTANCE.newChannel("MCHReforged", this);
-        registerPacket(PacketEntitySync.class);
+        registerPacket(PacketEntityInfoSync.class);
         registerPacket(PacketLaserGuidanceTargeting.class);
         registerPacket(PacketLockTarget.class);
     }

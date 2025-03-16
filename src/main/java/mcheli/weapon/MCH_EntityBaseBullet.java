@@ -461,18 +461,13 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
             return;
         }
 
-//        // 使用平滑加权平均值来更新当前实体的运动速度
-//        super.motionX = (super.motionX * 6.0D + mx) / 7.0D;  // 更新X轴速度
-//        super.motionY = (super.motionY * 6.0D + my) / 7.0D;  // 更新Y轴速度
-//        super.motionZ = (super.motionZ * 6.0D + mz) / 7.0D;  // 更新Z轴速度
-
         // 使用平滑加权平均值来更新当前实体的运动速度
         super.motionX = super.motionX + (mx - super.motionX) * getInfo().turningFactor;  // 平滑过渡X轴速度
         super.motionY = super.motionY + (my - super.motionY) * getInfo().turningFactor;  // 平滑过渡Y轴速度
         super.motionZ = super.motionZ + (mz - super.motionZ) * getInfo().turningFactor;  // 平滑过渡Z轴速度
 
         // 计算实体朝向目标的旋转角度（Yaw方向）
-        double a = (double)((float)Math.atan2(super.motionZ, super.motionX));  // 计算水平方向的角度（Yaw）
+        double a = (float)Math.atan2(super.motionZ, super.motionX);  // 计算水平方向的角度（Yaw）
         super.rotationYaw = (float)(a * 180.0D / 3.141592653589793D) - 90.0F;  // 转换为角度并设置实体的旋转Yaw
 
         // 计算实体的俯仰角度（Pitch方向）
@@ -518,7 +513,6 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
                 super.motionX = motionX * acceleration / d;
                 super.motionY = motionY * acceleration / d;
                 super.motionZ = motionZ * acceleration / d;
-                System.out.println("更新子弹速度 + " + s);
                 speedAddedFromAircraft = true;
             }
         }
@@ -628,6 +622,7 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
                     motionX += dirX * getInfo().speedFactor;
                     motionY += dirY * getInfo().speedFactor;
                     motionZ += dirZ * getInfo().speedFactor;
+                    acceleration += getInfo().speedFactor;
                 }
             }
             super.motionY += this.getGravity();

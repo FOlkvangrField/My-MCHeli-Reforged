@@ -6134,8 +6134,8 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       this.towedChainEntity = towedChainEntity;
    }
 
-    public String getNameOnRadar(MCH_EntityAircraft ac) {
-      switch (ac.getAcInfo().radarType) {
+    public String getNameOnOtherRadar(MCH_EntityAircraft other) {
+      switch (other.getAcInfo().radarType) {
          case MODERN_AA: return getAcInfo().nameOnModernAARadar;
          case EARLY_AA: return getAcInfo().nameOnEarlyAARadar;
          case MODERN_AS: return getAcInfo().nameOnModernASRadar;
@@ -6143,6 +6143,27 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       }
       return "?";
     }
+
+    public String getNameOnMyRadar(MCH_EntityAircraft other) {
+       switch (getAcInfo().radarType) {
+          case MODERN_AA: return other.getAcInfo().nameOnModernAARadar;
+          case EARLY_AA: return other.getAcInfo().nameOnEarlyAARadar;
+          case MODERN_AS: return other.getAcInfo().nameOnModernASRadar;
+          case EARLY_AS: return other.getAcInfo().nameOnEarlyASRadar;
+       }
+       return "?";
+    }
+
+   public String getNameOnMyRadar(MCH_EntityInfo other) {
+      MCH_AircraftInfo info = MCH_AircraftInfo.allAircraftInfo.getOrDefault(other.entityName, null);
+      switch (getAcInfo().radarType) {
+         case MODERN_AA: return info.nameOnModernAARadar;
+         case EARLY_AA: return info.nameOnEarlyAARadar;
+         case MODERN_AS: return info.nameOnModernASRadar;
+         case EARLY_AS: return info.nameOnEarlyASRadar;
+      }
+      return "?";
+   }
 
    public class WeaponBay {
 
