@@ -148,8 +148,8 @@ public class MCH_MOD {
       MCH_Lib.init();
       MCH_Lib.Log("MC Ver:1.7.10 MOD Ver:" + VER + "", new Object[0]);
       MCH_Lib.Log("Start load...", new Object[0]);
-      //sourcePath = Loader.instance().activeModContainer().getSource().getPath();
-      sourcePath = "D:\\软件\\GitHub\\MCHeli-Reforged\\src\\main\\resources";
+      sourcePath = Loader.instance().activeModContainer().getSource().getPath();
+      ///sourcePath = "D:\\软件\\GitHub\\MCHeli-Reforged\\src\\main\\resources";
               //new File(evt.getModConfigurationDirectory().getParentFile(), "/mods").getPath();
       MCH_Lib.Log("SourcePath: " + sourcePath, new Object[0]);
       MCH_Lib.Log("CurrentDirectory:" + (new File(".")).getAbsolutePath(), new Object[0]);
