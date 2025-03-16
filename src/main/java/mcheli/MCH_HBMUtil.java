@@ -59,13 +59,13 @@ public class MCH_HBMUtil {
         }
     }
 
-    public static void ExplosionCreator_composeEffectStandard(World world, double posX, double posY, double posZ, int explosionPower) {
+    public static void ExplosionCreator_composeEffectStandard(World world, double posX, double posY, double posZ, int explosionBlockSize) {
         try {
             if (explosionCreatorClass != null) {
                 Method spawnChlorineMethod;
-                if(explosionPower<10) {
+                if(explosionBlockSize<50) {
                     spawnChlorineMethod = explosionCreatorClass.getMethod("composeEffectSmall", World.class, double.class, double.class, double.class);
-                } else if (explosionPower<20) {
+                } else if (explosionBlockSize<100) {
                     spawnChlorineMethod = explosionCreatorClass.getMethod("composeEffectStandard", World.class, double.class, double.class, double.class);
                 }
                 else {
@@ -98,6 +98,18 @@ public class MCH_HBMUtil {
                 overrideResolutionMethod.invoke(explosionNTInstance, resolution);
                 Method explodeMethod = explosionNTInstance.getClass().getMethod("explode");
                 explodeMethod.invoke(explosionNTInstance);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public static void ExplosionNT_instance_addAttrib(Object explosionNTInstance, String attrib) {
+        try {
+            if (explosionNTInstance != null) {
+                Class<?> exAttribClass = Class.forName("com.hbm.explosion.ExplosionNT$ExAttrib");
+                Object Attrib = Enum.valueOf((Class<Enum>) exAttribClass, attrib);
+                Method addAttribMethod = explosionNT.getMethod("addAttrib", exAttribClass);
+                addAttribMethod.invoke(explosionNTInstance,Attrib);
             }
         } catch (Exception e) {
             e.printStackTrace();

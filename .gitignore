@@ -17,9 +17,12 @@
 # gradle
 /build
 /.gradle
+/gradle
+gradle.properties
 
 # vscode
 /.vscode
 
 # other
 /run
+/src/main/resources/assets

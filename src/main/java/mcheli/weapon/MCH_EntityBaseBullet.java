@@ -1013,11 +1013,14 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
         MCH_Explosion.ExplosionResult result;
         if(!inWater) {
             if(this.getInfo().explosionType.equals("hbmNT_Bomb")){
-                Object explosionNTInstance = MCH_HBMUtil.ExplosionNT_instance_init(super.worldObj, null, this.posX + 0.5, this.posY + 0.5, this.posZ + 0.5, this.explosionPower);
+                int hbmExplosionPower = this.explosionPower;
+
+                Object explosionNTInstance = MCH_HBMUtil.ExplosionNT_instance_init(super.worldObj, null, x, y, z, expBlock);
                 if (explosionNTInstance != null) {
-                    MCH_HBMUtil.ExplosionNT_instance_overrideResolutionAndExplode(explosionNTInstance, (int) expBlock);
+                    MCH_HBMUtil.ExplosionNT_instance_addAttrib(explosionNTInstance,"NOHURT");
+                    MCH_HBMUtil.ExplosionNT_instance_overrideResolutionAndExplode(explosionNTInstance, 64);
                 }
-                MCH_HBMUtil.ExplosionCreator_composeEffectStandard(worldObj, this.posX + 0.5, this.posY + 1, this.posZ + 0.5, this.explosionPower);
+                MCH_HBMUtil.ExplosionCreator_composeEffectStandard(worldObj, x + 0.5, y + 1, z + 0.5, (int) expBlock);
                 result = MCH_Explosion.newExplosion(super.worldObj, this, this.shootingEntity, x, y, z, exp, expBlock, this.isBomblet == 1 ? super.rand.nextInt(3) == 0 : true, false, this.getInfo().flaming, false, 0, this.getInfo() != null ? this.getInfo().damageFactor : null);
             }
             else{
