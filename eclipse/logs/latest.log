@@ -1,0 +1,36 @@
+[20:10:53] [main/INFO]: Setting user: Player532
+[20:10:57] [Client thread/INFO]: LWJGL Version: 2.9.1
+[20:11:15] [Client thread/INFO]: Reloading ResourceManager: Default, FMLFileResourcePack:Forge Mod Loader, FMLFileResourcePack:Minecraft Forge, FMLFileResourcePack:Not Enough Items, FMLFileResourcePack:Advanced Rocketry, FMLFileResourcePack:Ancient Warfare Automation, FMLFileResourcePack:Ancient Warfare Core, FMLFileResourcePack:Ancient Warfare Model Editor, FMLFileResourcePack:Ancient Warfare NEI Plugin, FMLFileResourcePack:Ancient Warfare NPCs, FMLFileResourcePack:Ancient Warfare Structures, FMLFileResourcePack:Ancient Warfare Vehicles, FMLFileResourcePack:Block Physics, FMLFileResourcePack:BNBGamingLib, FMLFileResourcePack:Flan's Mod Ultimate, FMLFileResourcePack:Hbm's Nuclear Tech, FMLFileResourcePack:Ships Mod, FMLFileResourcePack:Mcheli Overdrive
+[20:11:15] [Client thread/WARN]: ResourcePack: ignored non-lowercase namespace: mapOverlay.png in D:\软件\GitHub\MCH-mocmaster\lib\ancientwarfare-2.4.722-beta-MC1.7.10.jar
+[20:11:15] [Client thread/WARN]: ResourcePack: ignored non-lowercase namespace: mapScreen.png in D:\软件\GitHub\MCH-mocmaster\lib\ancientwarfare-2.4.722-beta-MC1.7.10.jar
+[20:11:15] [Client thread/WARN]: ResourcePack: ignored non-lowercase namespace: mapOverlay.png in D:\软件\GitHub\MCH-mocmaster\lib\ancientwarfare-2.4.722-beta-MC1.7.10.jar
+[20:11:15] [Client thread/WARN]: ResourcePack: ignored non-lowercase namespace: mapScreen.png in D:\软件\GitHub\MCH-mocmaster\lib\ancientwarfare-2.4.722-beta-MC1.7.10.jar
+[20:11:15] [Client thread/WARN]: ResourcePack: ignored non-lowercase namespace: mapOverlay.png in D:\软件\GitHub\MCH-mocmaster\lib\ancientwarfare-2.4.722-beta-MC1.7.10.jar
+[20:11:15] [Client thread/WARN]: ResourcePack: ignored non-lowercase namespace: mapScreen.png in D:\软件\GitHub\MCH-mocmaster\lib\ancientwarfare-2.4.722-beta-MC1.7.10.jar
+[20:11:15] [Client thread/WARN]: ResourcePack: ignored non-lowercase namespace: mapOverlay.png in D:\软件\GitHub\MCH-mocmaster\lib\ancientwarfare-2.4.722-beta-MC1.7.10.jar
+[20:11:15] [Client thread/WARN]: ResourcePack: ignored non-lowercase namespace: mapScreen.png in D:\软件\GitHub\MCH-mocmaster\lib\ancientwarfare-2.4.722-beta-MC1.7.10.jar
+[20:11:15] [Client thread/WARN]: ResourcePack: ignored non-lowercase namespace: mapOverlay.png in D:\软件\GitHub\MCH-mocmaster\lib\ancientwarfare-2.4.722-beta-MC1.7.10.jar
+[20:11:15] [Client thread/WARN]: ResourcePack: ignored non-lowercase namespace: mapScreen.png in D:\软件\GitHub\MCH-mocmaster\lib\ancientwarfare-2.4.722-beta-MC1.7.10.jar
+[20:11:15] [Client thread/WARN]: ResourcePack: ignored non-lowercase namespace: mapOverlay.png in D:\软件\GitHub\MCH-mocmaster\lib\ancientwarfare-2.4.722-beta-MC1.7.10.jar
+[20:11:15] [Client thread/WARN]: ResourcePack: ignored non-lowercase namespace: mapScreen.png in D:\软件\GitHub\MCH-mocmaster\lib\ancientwarfare-2.4.722-beta-MC1.7.10.jar
+[20:11:15] [Client thread/WARN]: ResourcePack: ignored non-lowercase namespace: mapOverlay.png in D:\软件\GitHub\MCH-mocmaster\lib\ancientwarfare-2.4.722-beta-MC1.7.10.jar
+[20:11:15] [Client thread/WARN]: ResourcePack: ignored non-lowercase namespace: mapScreen.png in D:\软件\GitHub\MCH-mocmaster\lib\ancientwarfare-2.4.722-beta-MC1.7.10.jar
+[20:11:16] [Sound Library Loader/INFO]: Sound engine started
+[20:11:18] [Client thread/INFO]: Created: 16x16 textures/blocks-atlas
+[20:11:18] [Client thread/INFO]: Created: 16x16 textures/items-atlas
+[20:11:19] [Client thread/FATAL]: Unreported exception thrown!
+java.lang.NoSuchMethodError: net.minecraft.client.Minecraft.func_71410_x()Lnet/minecraft/client/Minecraft;
+	at cuchaz.ships.core.ShipIntermediaryClient.onFoundHit(ShipIntermediaryClient.java:32) ~[shipsMod-v1.7.10-1.0.4.jar:?]
+	at net.minecraft.client.renderer.EntityRenderer.getMouseOver(EntityRenderer.java:440) ~[EntityRenderer.class:?]
+	at net.minecraft.client.Minecraft.runTick(Minecraft.java:1688) ~[Minecraft.class:?]
+	at net.minecraft.client.Minecraft.runGameLoop(Minecraft.java:1039) ~[Minecraft.class:?]
+	at net.minecraft.client.Minecraft.run(Minecraft.java:962) [Minecraft.class:?]
+	at net.minecraft.client.main.Main.main(Main.java:164) [Main.class:?]
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.8.0_301]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:1.8.0_301]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.8.0_301]
+	at java.lang.reflect.Method.invoke(Method.java:498) ~[?:1.8.0_301]
+	at net.minecraft.launchwrapper.Launch.launch(Launch.java:135) [launchwrapper-1.12.jar:?]
+	at net.minecraft.launchwrapper.Launch.main(Launch.java:28) [launchwrapper-1.12.jar:?]
+	at net.minecraftforge.gradle.GradleStartCommon.launch(Unknown Source) [start/:?]
+	at GradleStart.main(Unknown Source) [start/:?]
