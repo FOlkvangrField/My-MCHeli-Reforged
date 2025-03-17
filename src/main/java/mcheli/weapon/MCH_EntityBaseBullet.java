@@ -1097,17 +1097,22 @@ public abstract class MCH_EntityBaseBullet extends W_Entity implements MCH_IChun
     public void newExplosion(double x, double y, double z, float exp, float expBlock, boolean inWater) {
         MCH_Explosion.ExplosionResult result;
         if(!inWater) {
-            result = MCH_Explosion.newExplosion(super.worldObj, this, this.shootingEntity, x, y, z, exp, expBlock, this.isBomblet == 1?super.rand.nextInt(3) == 0:true, true, this.getInfo().flaming, true, 0, this.getInfo() != null?this.getInfo().damageFactor:null);
+            if(this.getInfo().explosionType.equals("hbmNT_Bomb")){
+                int hbmExplosionPower = this.explosionPower;
+
+                Object explosionNTInstance = MCH_HBMUtil.ExplosionNT_instance_init(super.worldObj, null, x, y, z, expBlock);
+                if (explosionNTInstance != null) {
+                    MCH_HBMUtil.ExplosionNT_instance_addAttrib(explosionNTInstance,"NOHURT");
+                    MCH_HBMUtil.ExplosionNT_instance_overrideResolutionAndExplode(explosionNTInstance, 64);
+                }
+                MCH_HBMUtil.ExplosionCreator_composeEffectStandard(worldObj, x + 0.5, y + 1, z + 0.5, (int) expBlock);
+                result = MCH_Explosion.newExplosion(super.worldObj, this, this.shootingEntity, x, y, z, exp, expBlock, this.isBomblet == 1 ? super.rand.nextInt(3) == 0 : true, false, this.getInfo().flaming, false, 0, this.getInfo() != null ? this.getInfo().damageFactor : null);
+            }
+            else{
+                result = MCH_Explosion.newExplosion(super.worldObj, this, this.shootingEntity, x, y, z, exp, expBlock, this.isBomblet == 1 ? super.rand.nextInt(3) == 0 : true, true, this.getInfo().flaming, true, 0, this.getInfo() != null ? this.getInfo().damageFactor : null);
+            }
         } else {
             result = MCH_Explosion.newExplosionInWater(super.worldObj, this, this.shootingEntity, x, y, z, exp, expBlock, this.isBomblet == 1?super.rand.nextInt(3) == 0:true, true, this.getInfo().flaming, true, 0, this.getInfo() != null?this.getInfo().damageFactor:null);
-        }
-
-        if(this.getInfo().explosionType.equals("hbmNT")){
-            Object explosionNTInstance = MCH_HBMUtil.ExplosionNT_instance_init(super.worldObj, null, this.posX + 0.5, this.posY + 0.5, this.posZ + 0.5, this.explosionPower);
-            if (explosionNTInstance != null) {
-                MCH_HBMUtil.ExplosionNT_instance_overrideResolutionAndExplode(explosionNTInstance, (int) expBlock);
-            }
-            MCH_HBMUtil.ExplosionCreator_composeEffectStandard(worldObj, this.posX + 0.5, this.posY + 1, this.posZ + 0.5);
         }
 
         if(this.getInfo().nukeYield > 0) {
