@@ -3,6 +3,7 @@ package mcheli;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import mcheli.aircraft.MCH_EntityAircraft;
 import mcheli.aircraft.MCH_EntitySeat;
+import mcheli.helicopter.MCH_EntityHeli;
 import mcheli.plane.MCP_EntityPlane;
 import mcheli.uav.MCH_EntityUavStation;
 import mcheli.wrapper.W_MOD;
@@ -52,7 +53,7 @@ public class MCH_RenderRWR {
         } else if(player.ridingEntity instanceof MCH_EntityUavStation) {
             ac = ((MCH_EntityUavStation)player.ridingEntity).getControlAircract();
         }
-        if(!(ac instanceof MCP_EntityPlane)) return;
+        if(!(ac instanceof MCP_EntityPlane || ac instanceof MCH_EntityHeli)) return;
 
         //开始渲染
         GL11.glPushMatrix();
@@ -139,7 +140,8 @@ public class MCH_RenderRWR {
 
     // 新增实体校验方法
     private boolean isValidEntity(MCH_EntityInfo entity, EntityPlayer player) {
-        if (entity.entityClassName.contains("MCH_EntityChaff") || entity.entityClassName.contains("EntityPlayer")) {
+        if (entity.entityClassName.contains("MCH_EntityChaff") || entity.entityClassName.contains("MCH_EntityFlare")
+                || entity.entityClassName.contains("EntityPlayer")) {
             return false;
         }
         if(entity.getDistanceSqToEntity(player) < MIN_DISTANCE * MIN_DISTANCE) {

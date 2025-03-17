@@ -2,7 +2,9 @@ package mcheli.flare;
 
 import mcheli.MCH_Explosion;
 import mcheli.MCH_FMURUtil;
+import mcheli.MCH_MOD;
 import mcheli.aircraft.MCH_EntityAircraft;
+import mcheli.network.packets.PacketIronCurtainUse;
 import mcheli.weapon.*;
 import mcheli.wrapper.W_McClient;
 import mcheli.wrapper.W_WorldFunc;
@@ -62,6 +64,7 @@ public class MCH_APS {
             if(range == 100) {
                 W_WorldFunc.MOD_playSoundEffect(worldObj, aircraft.posX, aircraft.posY, aircraft.posZ, "iron_curtain", 10.0F, 1.0F);
                 aircraft.ironCurtainRunningTick = useTick;
+                MCH_MOD.getPacketHandler().sendToAll(new PacketIronCurtainUse(aircraft.getEntityId(), useTick));
             } else {
                 W_WorldFunc.MOD_playSoundEffect(worldObj, aircraft.posX, aircraft.posY, aircraft.posZ, "aps_activate", 10.0F, 1.0F);
             }
@@ -91,21 +94,6 @@ public class MCH_APS {
     }
 
     private void onUsing() {
-        if(range == 100) {
-            if (aircraft.ironCurtainRunningTick > 0) {
-                aircraft.ironCurtainRunningTick--;
-                //每tick更新波动因子
-                aircraft.ironCurtainWaveTimer++;
-                aircraft.ironCurtainLastFactor = aircraft.ironCurtainCurrentFactor;
-                //基于计时器生成波动曲线（0.5~1.0）
-                float waveSpeed = 0.25f;
-                aircraft.ironCurtainCurrentFactor = 0.75f + 0.25f * (float) Math.sin(aircraft.ironCurtainWaveTimer * waveSpeed);
-            } else {
-                aircraft.ironCurtainWaveTimer = 0;
-                aircraft.ironCurtainCurrentFactor = 0.5f;
-                aircraft.ironCurtainLastFactor = 0.5f;
-            }
-        }
         if(worldObj.isRemote) {
         } else {
             if(range == 100) {

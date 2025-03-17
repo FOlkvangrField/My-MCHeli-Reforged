@@ -124,7 +124,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
    private int radarRotate;
    private MCH_Flare flareDv;
    private int currentFlareIndex;
-   protected MCH_WeaponSet[] weapons;
+   public MCH_WeaponSet[] weapons;
    protected int[] currentWeaponID;
    public float lastRiderYaw;
    public float prevLastRiderYaw;
@@ -1462,7 +1462,17 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
          this.prevPosition.clear(Vec3.createVectorHelper(super.posX, super.posY, super.posZ));
       }
 
-
+      if(ironCurtainRunningTick > 0) {
+         ironCurtainRunningTick--;
+         ironCurtainWaveTimer++;
+         ironCurtainLastFactor = ironCurtainCurrentFactor;//基于计时器生成波动曲线（0.5~1.0）
+         float waveSpeed = 0.25f;
+         ironCurtainCurrentFactor = 0.75f + 0.25f * (float) Math.sin(ironCurtainWaveTimer * waveSpeed);
+      } else {
+         ironCurtainWaveTimer = 0;
+         ironCurtainCurrentFactor = 0.5f;
+         ironCurtainLastFactor = 0.5f;
+      }
 
       this.prevCurrentThrottle = this.getCurrentThrottle();
       this.lastBBDamageFactor = 1.0F;
@@ -4923,6 +4933,9 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       this.currentWeaponID[sid] = id;
       MCH_WeaponSet ws = getCurrentWeapon(entity);
       ws.onSwitchWeapon(this.worldObj.isRemote, isInfinityAmmo(entity));
+      if(ws.getCurrentWeapon().worldObj.isRemote) {
+         W_McClient.MOD_playSoundFX(ws.getInfo().weaponSwitchSound, 3F, 1.0F);
+      }
       if (!this.worldObj.isRemote)
          MCH_PacketNotifyWeaponID.send((Entity)this, sid, id, ws.getAmmoNum(), ws.getRestAllAmmoNum());
    }

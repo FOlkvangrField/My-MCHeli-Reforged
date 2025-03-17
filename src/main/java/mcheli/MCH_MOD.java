@@ -218,14 +218,10 @@ public class MCH_MOD {
 
 
       try {
-         ForgeChunkManager.setForcedChunkLoadingCallback(this, new ForgeChunkManager.LoadingCallback() {
-
-            @Override
-            public void ticketsLoaded(List<ForgeChunkManager.Ticket> tickets, World world) {
-               for (ForgeChunkManager.Ticket ticket : tickets) {
-                  if (ticket.getEntity() instanceof MCH_EntityBullet) {
-                     ((MCH_IChunkLoader) ticket.getEntity()).init(ticket);
-                  }
+         ForgeChunkManager.setForcedChunkLoadingCallback(this, (tickets, world) -> {
+            for (ForgeChunkManager.Ticket ticket : tickets) {
+               if (ticket.getEntity() instanceof MCH_EntityBullet) {
+                  ((MCH_IChunkLoader) ticket.getEntity()).init(ticket);
                }
             }
          });

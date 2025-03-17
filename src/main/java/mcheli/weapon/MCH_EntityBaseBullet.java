@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class MCH_EntityBaseBullet extends W_Entity {
+public abstract class MCH_EntityBaseBullet extends W_Entity implements MCH_IChunkLoader {
 
     public static final int DATAWT_RESERVE1 = 26;
     public static final int DATAWT_TARGET_ENTITY = 27;

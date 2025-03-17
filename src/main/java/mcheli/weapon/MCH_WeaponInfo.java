@@ -498,6 +498,8 @@ public class MCH_WeaponInfo extends MCH_BaseInfo {
                 this.enableOffAxis = this.toBool(data);
             } else if (item.equalsIgnoreCase("TurningFactor")) {
                 this.turningFactor = this.toDouble(data);
+            } else if (item.equalsIgnoreCase("EnableChunkLoader")) {
+                this.enableChunkLoader = this.toBool(data);
             } else if (item.equalsIgnoreCase("ScanInterval")) {
                 this.scanInterval = this.toInt(data);
             } else if (item.equalsIgnoreCase("WeaponSwitchCount")) {
