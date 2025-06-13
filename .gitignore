@@ -26,3 +26,5 @@ gradle.properties
 # other
 /run
 /src/main/resources/assets
+/lib
+/.gradle

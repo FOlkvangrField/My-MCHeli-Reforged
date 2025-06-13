@@ -1012,7 +1012,7 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
     public void newExplosion(double x, double y, double z, float exp, float expBlock, boolean inWater) {
         MCH_Explosion.ExplosionResult result;
         if(!inWater) {
-            if(this.getInfo().explosionType.equals("hbmNT_Bomb")){
+            if(this.getInfo().explosionType.contains("hbmNT")){
                 int hbmExplosionPower = this.explosionPower;
 
                 Object explosionNTInstance = MCH_HBMUtil.ExplosionNT_instance_init(super.worldObj, null, x, y, z, expBlock);
@@ -1020,7 +1020,11 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
                     MCH_HBMUtil.ExplosionNT_instance_addAttrib(explosionNTInstance,"NOHURT");
                     MCH_HBMUtil.ExplosionNT_instance_overrideResolutionAndExplode(explosionNTInstance, 64);
                 }
-                MCH_HBMUtil.ExplosionCreator_composeEffectStandard(worldObj, x + 0.5, y + 1, z + 0.5, (int) expBlock);
+                if(this.getInfo().explosionType.equals("hbmNT_Bomb")) {
+                    MCH_HBMUtil.ExplosionCreator_composeEffect(worldObj, x + 0.5, y + 1, z + 0.5, (int) expBlock);
+                } else if (this.getInfo().explosionType.equals("hbmNT_Shell")) {
+                    MCH_HBMUtil.ExplosionSmallCreator_composeEffect(worldObj, x + 0.5, y + 1, z + 0.5, (int) expBlock);
+                }
                 result = MCH_Explosion.newExplosion(super.worldObj, this, this.shootingEntity, x, y, z, exp, expBlock, this.isBomblet == 1 ? super.rand.nextInt(3) == 0 : true, false, this.getInfo().flaming, false, 0, this.getInfo() != null ? this.getInfo().damageFactor : null);
             }
             else{
