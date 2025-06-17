@@ -4,16 +4,7 @@ import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.relauncher.Side;
 import java.util.Iterator;
-import mcheli.MCH_ClientCommonTickHandler;
-import mcheli.MCH_ClientEventHook;
-import mcheli.MCH_CommonProxy;
-import mcheli.MCH_Config;
-import mcheli.MCH_InvisibleItemRender;
-import mcheli.MCH_Lib;
-import mcheli.MCH_MOD;
-import mcheli.MCH_ModelManager;
-import mcheli.MCH_RenderNull;
-import mcheli.MCH_ViewEntityDummy;
+
 import mcheli.aircraft.MCH_AircraftInfo;
 import mcheli.aircraft.MCH_EntityAircraft;
 import mcheli.aircraft.MCH_EntityHide;
@@ -551,6 +542,8 @@ public class MCH_ClientProxy extends MCH_CommonProxy {
    public void init() {
       MinecraftForge.EVENT_BUS.register(new MCH_ParticlesUtil());
       MinecraftForge.EVENT_BUS.register(new MCH_ClientEventHook());
+      MinecraftForge.EVENT_BUS.register(new MCH_RenderBVRLockBox());
+      MinecraftForge.EVENT_BUS.register(new MCH_RenderRWR());
    }
 
    public void setCreativeDigDelay(int n) {

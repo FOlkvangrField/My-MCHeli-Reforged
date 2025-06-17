@@ -141,7 +141,7 @@ public class MCP_PlaneInfo extends MCH_AircraftInfo {
             this.isEnableAutoPilot = this.toBool(data);
          }
       }
-
+      MCH_AircraftInfo.allAircraftInfo.put(name, this);
    }
 
    public String getDirectoryName() {

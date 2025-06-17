@@ -124,7 +124,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
    private int radarRotate;
    private MCH_Flare flareDv;
    private int currentFlareIndex;
-   protected MCH_WeaponSet[] weapons;
+   public MCH_WeaponSet[] weapons;
    protected int[] currentWeaponID;
    public float lastRiderYaw;
    public float prevLastRiderYaw;
@@ -228,6 +228,11 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
    public MCH_Chaff chaff;
    public MCH_Maintenance maintenance;
    public MCH_APS aps;
+
+   public int ironCurtainRunningTick = 0;
+   public float ironCurtainLastFactor = 0.5f;
+   public float ironCurtainCurrentFactor = 0.5f;
+   public int ironCurtainWaveTimer = 0;
 
    public MCH_EntityAircraft(World world) {
       super(world);
@@ -878,6 +883,9 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
 //
       //}
 
+      if(ironCurtainRunningTick > 0) {
+         return false;
+      }
 
       //System.out.println("the damage source is " + damageSource.getDamageType());
       //System.out.println("org damage: " + org_damage);
@@ -1454,7 +1462,17 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
          this.prevPosition.clear(Vec3.createVectorHelper(super.posX, super.posY, super.posZ));
       }
 
-
+      if(ironCurtainRunningTick > 0) {
+         ironCurtainRunningTick--;
+         ironCurtainWaveTimer++;
+         ironCurtainLastFactor = ironCurtainCurrentFactor;//基于计时器生成波动曲线（0.5~1.0）
+         float waveSpeed = 0.25f;
+         ironCurtainCurrentFactor = 0.75f + 0.25f * (float) Math.sin(ironCurtainWaveTimer * waveSpeed);
+      } else {
+         ironCurtainWaveTimer = 0;
+         ironCurtainCurrentFactor = 0.5f;
+         ironCurtainLastFactor = 0.5f;
+      }
 
       this.prevCurrentThrottle = this.getCurrentThrottle();
       this.lastBBDamageFactor = 1.0F;
@@ -1689,27 +1707,27 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
             }
 
             if(this.getTowChainEntity() != null && this.getTowChainEntity().towedEntity != null) {
-               this.noCollisionEntities.put(this.getTowChainEntity().towedEntity, Integer.valueOf(60));
+               this.noCollisionEntities.put(this.getTowChainEntity().towedEntity, 60);
             }
 
             if(this.getTowedChainEntity() != null && this.getTowedChainEntity().towEntity != null) {
-               this.noCollisionEntities.put(this.getTowedChainEntity().towEntity, Integer.valueOf(60));
+               this.noCollisionEntities.put(this.getTowedChainEntity().towEntity, 60);
             }
 
             if(super.ridingEntity instanceof MCH_EntitySeat) {
                MCH_EntityAircraft var3 = ((MCH_EntitySeat)super.ridingEntity).getParent();
                if(var3 != null) {
-                  this.noCollisionEntities.put(var3, Integer.valueOf(60));
+                  this.noCollisionEntities.put(var3, 60);
                }
             } else if(super.ridingEntity != null) {
-               this.noCollisionEntities.put(super.ridingEntity, Integer.valueOf(60));
+               this.noCollisionEntities.put(super.ridingEntity, 60);
             }
 
             Iterator var4 = this.noCollisionEntities.keySet().iterator();
 
             while(var4.hasNext()) {
                key1 = (Entity)var4.next();
-               this.noCollisionEntities.put(key1, Integer.valueOf(((Integer)this.noCollisionEntities.get(key1)).intValue() - 1));
+               this.noCollisionEntities.put(key1, (Integer) this.noCollisionEntities.get(key1) - 1);
             }
 
             var4 = this.noCollisionEntities.values().iterator();
@@ -4915,6 +4933,9 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       this.currentWeaponID[sid] = id;
       MCH_WeaponSet ws = getCurrentWeapon(entity);
       ws.onSwitchWeapon(this.worldObj.isRemote, isInfinityAmmo(entity));
+      if(ws.getCurrentWeapon().worldObj.isRemote) {
+         W_McClient.MOD_playSoundFX(ws.getInfo().weaponSwitchSound, 3F, 1.0F);
+      }
       if (!this.worldObj.isRemote)
          MCH_PacketNotifyWeaponID.send((Entity)this, sid, id, ws.getAmmoNum(), ws.getRestAllAmmoNum());
    }
@@ -6126,8 +6147,8 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       this.towedChainEntity = towedChainEntity;
    }
 
-    public String getNameOnRadar(MCH_EntityAircraft ac) {
-      switch (ac.getAcInfo().radarType) {
+    public String getNameOnOtherRadar(MCH_EntityAircraft other) {
+      switch (other.getAcInfo().radarType) {
          case MODERN_AA: return getAcInfo().nameOnModernAARadar;
          case EARLY_AA: return getAcInfo().nameOnEarlyAARadar;
          case MODERN_AS: return getAcInfo().nameOnModernASRadar;
@@ -6135,6 +6156,27 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
       }
       return "?";
     }
+
+    public String getNameOnMyRadar(MCH_EntityAircraft other) {
+       switch (getAcInfo().radarType) {
+          case MODERN_AA: return other.getAcInfo().nameOnModernAARadar;
+          case EARLY_AA: return other.getAcInfo().nameOnEarlyAARadar;
+          case MODERN_AS: return other.getAcInfo().nameOnModernASRadar;
+          case EARLY_AS: return other.getAcInfo().nameOnEarlyASRadar;
+       }
+       return "?";
+    }
+
+   public String getNameOnMyRadar(MCH_EntityInfo other) {
+      MCH_AircraftInfo info = MCH_AircraftInfo.allAircraftInfo.getOrDefault(other.entityName, null);
+      switch (getAcInfo().radarType) {
+         case MODERN_AA: return info.nameOnModernAARadar;
+         case EARLY_AA: return info.nameOnEarlyAARadar;
+         case MODERN_AS: return info.nameOnModernASRadar;
+         case EARLY_AS: return info.nameOnEarlyASRadar;
+      }
+      return "?";
+   }
 
    public class WeaponBay {
 

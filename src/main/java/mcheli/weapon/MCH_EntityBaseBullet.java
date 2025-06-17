@@ -3,11 +3,6 @@ package mcheli.weapon;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import mcheli.*;
 import mcheli.aircraft.MCH_EntityAircraft;
 import mcheli.aircraft.MCH_EntityHitBox;
@@ -27,20 +22,22 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.EntityCloudFX;
 import net.minecraft.client.particle.EntityDiggingFX;
 import net.minecraft.client.particle.EntityFX;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
+import org.lwjgl.opengl.GL11;
 
-public abstract class MCH_EntityBaseBullet extends W_Entity {
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+public abstract class MCH_EntityBaseBullet extends W_Entity implements MCH_IChunkLoader {
 
     public static final int DATAWT_RESERVE1 = 26;
     public static final int DATAWT_TARGET_ENTITY = 27;
@@ -71,7 +68,7 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
     public double prevMotionZ;
     public int antiFlareTick;
     boolean doingTopAttack = false;
-
+    boolean speedAddedFromAircraft = false;
     private ForgeChunkManager.Ticket chunkLoaderTicket;
     private List<ChunkCoordIntPair> loadedChunks = new ArrayList<>();
 
@@ -110,8 +107,7 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
         if(acceleration > 3.9D) {
             acceleration = 3.9D;
         }
-
-        double d = (double)MathHelper.sqrt_double(mx * mx + my * my + mz * mz);
+        double d = MathHelper.sqrt_double(mx * mx + my * my + mz * mz);
         super.motionX = mx * acceleration / d;
         super.motionY = my * acceleration / d;
         super.motionZ = mz * acceleration / d;
@@ -410,13 +406,6 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
         this.shootingEntity = user;
     }
 
-    public void setMotion(double targetX, double targetY, double targetZ) {
-        double d6 = (double)MathHelper.sqrt_double(targetX * targetX + targetY * targetY + targetZ * targetZ);
-        super.motionX = targetX * this.acceleration / d6;
-        super.motionY = targetY * this.acceleration / d6;
-        super.motionZ = targetZ * this.acceleration / d6;
-    }
-
     public void guidanceToTarget(double targetPosX, double targetPosY, double targetPosZ) {
         this.guidanceToTarget(targetPosX, targetPosY, targetPosZ, 1.0F);
     }
@@ -472,18 +461,13 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
             return;
         }
 
-//        // 使用平滑加权平均值来更新当前实体的运动速度
-//        super.motionX = (super.motionX * 6.0D + mx) / 7.0D;  // 更新X轴速度
-//        super.motionY = (super.motionY * 6.0D + my) / 7.0D;  // 更新Y轴速度
-//        super.motionZ = (super.motionZ * 6.0D + mz) / 7.0D;  // 更新Z轴速度
-
         // 使用平滑加权平均值来更新当前实体的运动速度
         super.motionX = super.motionX + (mx - super.motionX) * getInfo().turningFactor;  // 平滑过渡X轴速度
         super.motionY = super.motionY + (my - super.motionY) * getInfo().turningFactor;  // 平滑过渡Y轴速度
         super.motionZ = super.motionZ + (mz - super.motionZ) * getInfo().turningFactor;  // 平滑过渡Z轴速度
 
         // 计算实体朝向目标的旋转角度（Yaw方向）
-        double a = (double)((float)Math.atan2(super.motionZ, super.motionX));  // 计算水平方向的角度（Yaw）
+        double a = (float)Math.atan2(super.motionZ, super.motionX);  // 计算水平方向的角度（Yaw）
         super.rotationYaw = (float)(a * 180.0D / 3.141592653589793D) - 90.0F;  // 转换为角度并设置实体的旋转Yaw
 
         // 计算实体的俯仰角度（Pitch方向）
@@ -519,6 +503,19 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
     }
 
     public void onUpdate() {
+
+        if(!worldObj.isRemote) {
+            if (shootingAircraft instanceof MCH_EntityAircraft && !speedAddedFromAircraft && getInfo().speedDependsAircraft) {
+                MCH_EntityAircraft ac = (MCH_EntityAircraft) shootingAircraft;
+                double s = Math.sqrt(ac.motionX * ac.motionX + ac.motionY * ac.motionY + ac.motionZ * ac.motionZ);
+                acceleration += s;
+                double d = MathHelper.sqrt_double(motionX * motionX + motionY * motionY + motionZ * motionZ);
+                super.motionX = motionX * acceleration / d;
+                super.motionY = motionY * acceleration / d;
+                super.motionZ = motionZ * acceleration / d;
+                speedAddedFromAircraft = true;
+            }
+        }
 
         if(getInfo() != null && getInfo().enableChunkLoader) {
             checkAndLoadChunks();
@@ -607,9 +604,30 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
         }
 
         if(!this.isInWater()) {
-            super.motionY += (double)this.getGravity();
+            if(ticksExisted > getInfo().speedFactorStartTick && ticksExisted < getInfo().speedFactorEndTick) {
+                // 计算当前总速度
+                double currentSpeed = Math.sqrt(
+                        motionX * motionX +
+                                motionY * motionY +
+                                motionZ * motionZ
+                );
+
+                if(currentSpeed > 0) { // 避免除以零
+                    // 获取速度方向单位向量
+                    double dirX = motionX / currentSpeed;
+                    double dirY = motionY / currentSpeed;
+                    double dirZ = motionZ / currentSpeed;
+
+                    // 沿速度方向叠加固定增量
+                    motionX += dirX * getInfo().speedFactor;
+                    motionY += dirY * getInfo().speedFactor;
+                    motionZ += dirZ * getInfo().speedFactor;
+                    acceleration += getInfo().speedFactor;
+                }
+            }
+            super.motionY += this.getGravity();
         } else {
-            super.motionY += (double)this.getGravityInWater();
+            super.motionY += this.getGravityInWater();
         }
 
         if(!super.isDead) {
@@ -944,8 +962,75 @@ public abstract class MCH_EntityBaseBullet extends W_Entity {
             if(m.entityHit == null) {
                 spawnBlockPar(m, m.blockX, m.blockY, m.blockZ);
             }
+
+            if(m.entityHit instanceof MCH_EntityAircraft) {
+                MCH_EntityAircraft ac = (MCH_EntityAircraft) m.entityHit;
+                if(ac.ironCurtainRunningTick > 0) {
+                    spawnIronCurtainParticle(m, m.blockX, m.blockY, m.blockZ);
+                }
+            }
         }
 
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void spawnIronCurtainParticle(MovingObjectPosition raytraceResult, int xTile, int yTile, int zTile) {
+        // 定义暗红色参数（RGB：0.5, 0.1, 0.1）
+        final float DARK_RED_R = 0.5f;
+        final float DARK_RED_G = 0.1f;
+        final float DARK_RED_B = 0.1f;
+
+        int num = getInfo().flakParticlesCrack + rand.nextInt(3);
+        float scale = 1.0F;
+        for (int i = 0; i < num; i++) {
+            EntityDiggingFX fx = new EntityDiggingFX(
+                    this.worldObj,
+                    raytraceResult.hitVec.xCoord + (rand.nextFloat() - 0.5D) * width,
+                    raytraceResult.hitVec.yCoord + 0.1D,
+                    raytraceResult.hitVec.zCoord + (rand.nextFloat() - 0.5D) * width,
+                    0, 0, 0,
+                    worldObj.getBlock(xTile, yTile, zTile),
+                    this.worldObj.getBlockMetadata(xTile, yTile, zTile)
+            );
+
+            // 覆盖原有颜色设置
+            fx.setRBGColorF(DARK_RED_R, DARK_RED_G, DARK_RED_B); // 强制设置为暗红色
+            fx.multipleParticleScaleBy(scale * 0.8f); // 适当缩小粒子尺寸
+
+            // 调整运动参数
+            fx.motionX += getInfo().flakParticlesDiff * (rand.nextGaussian() * 0.5);
+            fx.motionZ += getInfo().flakParticlesDiff * (rand.nextGaussian() * 0.5);
+            fx.motionY += getInfo().flakParticlesDiff * Math.abs(rand.nextGaussian());
+
+            Minecraft.getMinecraft().effectRenderer.addEffect(fx);
+        }
+
+        for (int i = 0; i < 50 + getInfo().flakParticlesDiff; i++) {
+            EntityCloudFX obj = new EntityCloudFX(
+                    worldObj,
+                    raytraceResult.hitVec.xCoord + (rand.nextFloat() - 0.5D) * width,
+                    raytraceResult.hitVec.yCoord + rand.nextGaussian() * height,
+                    raytraceResult.hitVec.zCoord + (rand.nextFloat() - 0.5D) * width,
+                    0D, 0D, 0D
+            ) {
+                // 重写渲染方法确保颜色固定
+                @Override
+                public void renderParticle(Tessellator tessellator, float partialTicks,
+                                           float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+                    GL11.glColor4f(DARK_RED_R, DARK_RED_G, DARK_RED_B, 1.0f);
+                    super.renderParticle(tessellator, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+                }
+            };
+
+            // 设置粒子参数
+            obj.setRBGColorF(DARK_RED_R, DARK_RED_G, DARK_RED_B);
+            obj.motionX = rand.nextGaussian() / 100; // 增加运动速度
+            obj.motionY = rand.nextGaussian() / 100;
+            obj.motionZ = rand.nextGaussian() / 100;
+            obj.renderDistanceWeight = 350D; // 增加可见距离
+
+            FMLClientHandler.instance().getClient().effectRenderer.addEffect(obj);
+        }
     }
 
     @SideOnly(Side.CLIENT)

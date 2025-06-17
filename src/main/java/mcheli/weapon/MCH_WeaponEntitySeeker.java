@@ -28,6 +28,7 @@ public abstract class MCH_WeaponEntitySeeker extends MCH_WeaponBase {
       this.guidanceSystem.isRadarMissile = wi.isRadarMissile;
       this.guidanceSystem.passiveRadar = wi.passiveRadar;
       this.guidanceSystem.passiveRadarLockOutCount = wi.passiveRadarLockOutCount;
+      this.guidanceSystem.canLockMissile = wi.canLockMissile;
    }
 
    @Override
