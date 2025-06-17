@@ -53,6 +53,10 @@ public abstract class MCH_EntityGuidanceSystem implements MCH_IGuidanceSystem {
      * 雷达弹多径杂波检测高度，飞机低于这个高度将使雷达弹脱锁
      */
     public int lockMinHeight = 12;
+    /**
+     * 是否可以锁定导弹实体
+     */
+    public boolean canLockMissile = false;
 
 
     public boolean canLockEntity(Entity entity) {

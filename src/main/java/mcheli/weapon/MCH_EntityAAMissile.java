@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class MCH_EntityAAMissile extends MCH_EntityBaseBullet {
+public class MCH_EntityAAMissile extends MCH_EntityBaseBullet implements MCH_IEntityLockChecker {
 
    public MCH_EntityAAMissile(World par1World) {
       super(par1World);
@@ -109,5 +109,10 @@ public class MCH_EntityAAMissile extends MCH_EntityBaseBullet {
 
    public MCH_BulletModel getDefaultBulletModel() {
       return MCH_DefaultBulletModels.AAMissile;
+   }
+
+   @Override
+   public boolean canLockEntity(Entity var1) {
+      return false;
    }
 }

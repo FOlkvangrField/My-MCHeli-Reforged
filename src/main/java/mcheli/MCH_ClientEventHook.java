@@ -185,8 +185,4 @@ public class MCH_ClientEventHook extends W_ClientEventHook {
       }
    }
 
-   @SubscribeEvent
-   public void onRenderHUD(RenderGameOverlayEvent.Post event) {
-   }
-
 }

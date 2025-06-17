@@ -17,7 +17,7 @@ public class MCH_WeaponSet {
 
    private static Random rand = new Random();
    private final String name;
-   protected MCH_WeaponBase[] weapons;
+   public MCH_WeaponBase[] weapons;
    private int currentWeaponIndex;
    public float rotationYaw;
    public float rotationPitch;
@@ -205,10 +205,6 @@ public class MCH_WeaponSet {
          } else {
             this.countWait = -cntSwitch;
          }
-      }
-
-      if(this.getCurrentWeapon().worldObj.isRemote) {
-         W_McClient.MOD_playSoundFX(getInfo().weaponSwitchSound, 3F, 1.0F);
       }
 
       this.currentWeaponIndex = 0;

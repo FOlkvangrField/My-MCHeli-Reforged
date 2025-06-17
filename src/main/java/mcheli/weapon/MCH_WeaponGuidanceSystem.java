@@ -337,15 +337,23 @@ public class MCH_WeaponGuidanceSystem extends MCH_EntityGuidanceSystem {
             return false;
          }
          // 红外弹可以锁定热焰弹
-         else if(this.isHeatSeekerMissile && entity instanceof MCH_EntityFlare) {
+         if(this.isHeatSeekerMissile && entity instanceof MCH_EntityFlare) {
             return true;
          }
          // 雷达弹可以锁定箔条
-         else if(this.isRadarMissile && entity instanceof MCH_EntityChaff) {
+         if(this.isRadarMissile && entity instanceof MCH_EntityChaff) {
             return true;
          }
+         // 锁定导弹
+         if(this.canLockMissile &&
+                 (entity instanceof MCH_EntityAAMissile || entity instanceof MCH_EntityATMissile
+                         || entity instanceof MCH_EntityASMissile || entity instanceof MCH_EntityTvMissile)) {
+            if(!W_Entity.isEqual(user, ((MCH_EntityBaseBullet) entity).shootingEntity)) {
+               return true;
+            }
+         }
          // 如果实体既不是生物实体，也不是飞机、车辆等特定类型，返回false
-         else if(!W_Lib.isEntityLivingBase(entity)
+         if(!W_Lib.isEntityLivingBase(entity)
                  && !(entity instanceof MCH_EntityAircraft)
                  && className.indexOf("EntityVehicle") < 0
                  && className.indexOf("EntityPlane") < 0

@@ -15,6 +15,7 @@ import java.util.*;
 
 public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
 
+   public static Map<String, MCH_AircraftInfo> allAircraftInfo = new HashMap<>();
 
    public final String name;
    public String displayName;
@@ -149,6 +150,12 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
     * 雷达种类
     */
    public EnumRadarType radarType = EnumRadarType.EARLY_AA;
+
+   /**
+    * RWR种类
+    */
+   public EnumRWRType rwrType = EnumRWRType.DIGITAL;
+
    /**
     * 当前载具在现代对空雷达中显示的名字
     */
@@ -599,6 +606,13 @@ public abstract class MCH_AircraftInfo extends MCH_BaseInfo {
                this.radarType = EnumRadarType.valueOf(data);
             } catch (Exception e) {
                this.radarType = EnumRadarType.MODERN_AA;
+            }
+         }
+         else if(item.equalsIgnoreCase("RWRType")) {
+            try {
+               this.rwrType = EnumRWRType.valueOf(data);
+            } catch (Exception e) {
+               this.rwrType = EnumRWRType.DIGITAL;
             }
          }
          else if(item.equalsIgnoreCase("NameOnModernAARadar")) {

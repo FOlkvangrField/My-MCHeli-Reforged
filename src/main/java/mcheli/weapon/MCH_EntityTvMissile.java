@@ -1,5 +1,7 @@
 package mcheli.weapon;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import mcheli.MCH_Lib;
 import mcheli.aircraft.MCH_EntityAircraft;
 import mcheli.aircraft.MCH_EntitySeat;
@@ -34,6 +36,13 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
 
     public MCH_EntityTvMissile(World par1World, double posX, double posY, double posZ, double targetX, double targetY, double targetZ, float yaw, float pitch, double acceleration) {
         super(par1World, posX, posY, posZ, targetX, targetY, targetZ, yaw, pitch, acceleration);
+    }
+
+    public void setMotion(double targetX, double targetY, double targetZ) {
+        double d6 = (double)MathHelper.sqrt_double(targetX * targetX + targetY * targetY + targetZ * targetZ);
+        super.motionX = targetX * this.acceleration / d6;
+        super.motionY = targetY * this.acceleration / d6;
+        super.motionZ = targetZ * this.acceleration / d6;
     }
 
     public void onUpdate() {
@@ -130,14 +139,14 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
             double posY;
             double posZ;
 
-            if (worldObj.isRemote) {
+            if (!worldObj.isRemote) {
                 posX = e.posX;
                 posY = e.posY + e.getEyeHeight();
                 posZ = e.posZ;
             } else {
-                posX = RenderManager.renderPosX;
-                posY = RenderManager.renderPosY;
-                posZ = RenderManager.renderPosZ;
+                posX = clientTarget().xCoord;
+                posY = clientTarget().yCoord;
+                posZ = clientTarget().zCoord;
             }
 
             // 计算发射源
@@ -180,6 +189,11 @@ public class MCH_EntityTvMissile extends MCH_EntityBaseBullet {
 
             onLaserGuide();
         }
+    }
+
+    @SideOnly(Side.CLIENT)
+    private Vec3 clientTarget() {
+        return Vec3.createVectorHelper(RenderManager.renderPosX, RenderManager.renderPosY, RenderManager.renderPosZ);
     }
 
     public void onLaserGuide() {
