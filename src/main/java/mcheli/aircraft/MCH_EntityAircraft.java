@@ -17,6 +17,7 @@ import mcheli.flare.MCH_APS;
 import mcheli.flare.MCH_Chaff;
 import mcheli.flare.MCH_Flare;
 import mcheli.flare.MCH_Maintenance;
+import mcheli.mob.MCH_EntityGunner;
 import mcheli.multiplay.MCH_Multiplay;
 import mcheli.parachute.MCH_EntityParachute;
 import mcheli.particles.MCH_ParticleParam;
@@ -554,7 +555,11 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
    }
 
    public boolean isCreative(Entity entity) {
-      return entity instanceof EntityPlayer && ((EntityPlayer)entity).capabilities.isCreativeMode;
+      if(entity instanceof EntityPlayer && ((EntityPlayer)entity).capabilities.isCreativeMode)
+         return true;
+      if(entity instanceof MCH_EntityGunner && ((MCH_EntityGunner)entity).isCreative)
+         return true;
+      return false;
    }
 
    public Entity getRiddenByEntity() {
@@ -2016,7 +2021,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
                if(this.getCountOnUpdate() % hook.interval == 0) {
                   for(int i = 1; i < this.getSeatNum(); ++i) {
                      MCH_EntitySeat seat = this.getSeat(i);
-                     if(seat != null && seat.riddenByEntity != null && !W_EntityPlayer.isPlayer(seat.riddenByEntity) && !(this.getSeatInfo(i + 1) instanceof MCH_SeatRackInfo)) {
+                     if(seat != null && seat.riddenByEntity != null && !W_EntityPlayer.isPlayer(seat.riddenByEntity) && !(this.getSeatInfo(i + 1) instanceof MCH_SeatRackInfo) && !(seat.riddenByEntity instanceof MCH_EntityGunner)) {
                         Entity entity = seat.riddenByEntity;
                         Vec3 dropPos = this.getTransformedPosition(hook.pos, (Vec3)this.prevPosition.oldest());
                         seat.posX = dropPos.xCoord;
@@ -3693,40 +3698,40 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
    }
 
    public void onMountPlayerSeat(MCH_EntitySeat seat, Entity entity) {
-      if(seat != null && entity instanceof EntityPlayer) {
-         if(super.worldObj.isRemote && MCH_Lib.getClientPlayer() == entity) {
-            this.switchGunnerFreeLookMode(false);
-         }
+      if (seat == null || !((entity instanceof EntityPlayer || entity instanceof MCH_EntityGunner) ? true : false))
+         return;
+      if(this.worldObj.isRemote && MCH_Lib.getClientPlayer() == entity) {
+         this.switchGunnerFreeLookMode(false);
+      }
 
-         this.initCurrentWeapon(entity);
-         MCH_Lib.DbgLog(super.worldObj, "onMountEntitySeat:%d", new Object[]{Integer.valueOf(W_Entity.getEntityId(entity))});
-         Entity pilot = this.getRiddenByEntity();
-         int sid = this.getSeatIdByEntity(entity);
-         if(sid == 1 && (this.getAcInfo() == null || !this.getAcInfo().isEnableConcurrentGunnerMode)) {
-            this.switchGunnerMode(false);
-         }
+      this.initCurrentWeapon(entity);
+      MCH_Lib.DbgLog(super.worldObj, "onMountEntitySeat:%d", new Object[]{Integer.valueOf(W_Entity.getEntityId(entity))});
+      Entity pilot = this.getRiddenByEntity();
+      int sid = this.getSeatIdByEntity(entity);
+      if(sid == 1 && (this.getAcInfo() == null || !this.getAcInfo().isEnableConcurrentGunnerMode)) {
+         this.switchGunnerMode(false);
+      }
 
-         if(sid > 0) {
-            this.isGunnerModeOtherSeat = true;
-         }
+      if(sid > 0) {
+         this.isGunnerModeOtherSeat = true;
+      }
 
-         if(pilot != null && this.getAcInfo() != null) {
-            int cwid = this.getCurrentWeaponID(pilot);
-            MCH_AircraftInfo.Weapon w = this.getAcInfo().getWeaponById(cwid);
-            if(w != null && this.getWeaponSeatID(this.getWeaponInfoById(cwid), w) == sid) {
-               int next = this.getNextWeaponID(pilot, 1);
-               MCH_Lib.DbgLog(super.worldObj, "onMountEntitySeat:%d:->%d", new Object[]{Integer.valueOf(W_Entity.getEntityId(pilot)), Integer.valueOf(next)});
-               if(next >= 0) {
-                  this.switchWeapon(pilot, next);
-               }
+      if(pilot != null && this.getAcInfo() != null) {
+         int cwid = this.getCurrentWeaponID(pilot);
+         MCH_AircraftInfo.Weapon w = this.getAcInfo().getWeaponById(cwid);
+         if(w != null && this.getWeaponSeatID(this.getWeaponInfoById(cwid), w) == sid) {
+            int next = this.getNextWeaponID(pilot, 1);
+            MCH_Lib.DbgLog(super.worldObj, "onMountEntitySeat:%d:->%d", new Object[]{Integer.valueOf(W_Entity.getEntityId(pilot)), Integer.valueOf(next)});
+            if(next >= 0) {
+               this.switchWeapon(pilot, next);
             }
          }
-
-         if(super.worldObj.isRemote) {
-            this.updateClientSettings(sid);
-         }
-
       }
+
+      if(super.worldObj.isRemote) {
+         this.updateClientSettings(sid);
+      }
+
    }
 
    public MCH_WeaponInfo getWeaponInfoById(int id) {
@@ -4593,9 +4598,9 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
    public boolean checkTeam(EntityPlayer player) {
       for(int i = 0; i < 1 + this.getSeatNum(); ++i) {
          Entity entity = this.getEntityBySeatId(i);
-         if(entity instanceof EntityPlayer) {
-            EntityPlayer riddenPlayer = (EntityPlayer)entity;
-            if(riddenPlayer.getTeam() != null && !riddenPlayer.isOnSameTeam(player)) {
+         if(entity instanceof EntityPlayer || entity instanceof MCH_EntityGunner) {
+            EntityLivingBase riddenPlayer = (EntityLivingBase)entity;
+            if(riddenPlayer.getTeam() != null && !riddenPlayer.isOnSameTeam((EntityLivingBase)player)) {
                return false;
             }
          }
@@ -4627,8 +4632,8 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
          /*      */
          /* 4374 */       return false;
          /* 4375 */     }
-      //if (itemStack != null && itemStack.getItem() instanceof mcheli.mob.MCH_ItemSpawnGunner)
-         /* 4376 */ //      return false;
+                     if (itemStack != null && itemStack.getItem() instanceof mcheli.mob.MCH_ItemSpawnGunner)
+         /* 4376 */       return false;
       /* 4377 */     if (player.isSneaking()) {
          /* 4378 */       openInventory(player);
          /* 4379 */       return false;
@@ -5009,16 +5014,17 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
    public void initCurrentWeapon(Entity entity) {
       /* 4760 */     int sid = getSeatIdByEntity(entity);
       /* 4761 */     MCH_Lib.DbgLog(this.worldObj, "initCurrentWeapon:" + W_Entity.getEntityId(entity) + ":%d", new Object[] { Integer.valueOf(sid) });
-      /* 4762 */     if (sid >= 0 && sid < this.currentWeaponID.length) {
-         /* 4763 */       this.currentWeaponID[sid] = -1;
-         /* 4764 */       if (entity instanceof EntityPlayer ) { //|| entity instanceof mcheli.mob.MCH_EntityGunner
-            /* 4765 */         this.currentWeaponID[sid] = getNextWeaponID(entity, 1);
-            /* 4766 */         switchWeapon(entity, getCurrentWeaponID(entity));
-            /* 4767 */         if (this.worldObj.isRemote) {
-               /* 4768 */           MCH_PacketIndNotifyAmmoNum.send(this, -1);
-               /*      */         }
-            /*      */       }
-         /*      */     }
+      /* 4762 */     if (sid < 0 || sid >= this.currentWeaponID.length)
+                        return;
+         /* 4763 */  this.currentWeaponID[sid] = -1;
+         /* 4764 */  if (entity instanceof EntityPlayer || entity instanceof MCH_EntityGunner) { //
+            /* 4765 */  this.currentWeaponID[sid] = getNextWeaponID(entity, 1);
+            /* 4766 */  switchWeapon(entity, getCurrentWeaponID(entity));
+            /* 4767 */  if (this.worldObj.isRemote) {
+              /* 4768 */   MCH_PacketIndNotifyAmmoNum.send(this, -1);
+              /*      */}
+         /*      */  }
+         /*      */
       /*      */   }
 
    public void initPilotWeapon() {
@@ -5159,7 +5165,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
    }
 
    public int getCurrentWeaponID(Entity entity) {
-      /* 4881 */     if (!(entity instanceof EntityPlayer) ) { //&& !(entity instanceof mcheli.mob.MCH_EntityGunner)
+      /* 4881 */     if (!(entity instanceof EntityPlayer ) && !(entity instanceof MCH_EntityGunner) ) { //
          /* 4882 */       return -1;
          /*      */     }
       /* 4884 */     int id = getSeatIdByEntity(entity);
@@ -5188,7 +5194,7 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
          /* 4908 */       if (w != null) {
             /* 4909 */         MCH_WeaponInfo wi = getWeaponInfoById(id);
             /* 4910 */         int wpsid = getWeaponSeatID(wi, w);
-            /* 4911 */         if (wpsid < getSeatNum() + 1 + 1 && (wpsid == sid || (sid == 0 && w.canUsePilot && !(getEntityBySeatId(wpsid) instanceof EntityPlayer) ))) { //&& !(getEntityBySeatId(wpsid) instanceof mcheli.mob.MCH_EntityGunner)
+            /* 4911 */         if (wpsid < getSeatNum() + 1 + 1 && (wpsid == sid || (sid == 0 && w.canUsePilot && !(getEntityBySeatId(wpsid) instanceof EntityPlayer) && !(getEntityBySeatId(wpsid) instanceof MCH_EntityGunner)))) { //
                /*      */           break;
                /*      */         }
             /*      */       }
@@ -5338,14 +5344,14 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
                   MCH_AircraftInfo.Weapon var17 = this.getAcInfo().getWeaponById(wid);
                   if(var17 != null && !this.isDestroyed()) {
                      Entity var19 = this.getEntityBySeatId(this.getWeaponSeatID(this.getWeaponInfoById(wid), var17));
-                     if(var17.canUsePilot && !(var19 instanceof EntityPlayer) ) { //&& !(entity instanceof mcheli.mob.MCH_EntityGunner)
+                     if(var17.canUsePilot && !(var19 instanceof EntityPlayer) && !(var19 instanceof MCH_EntityGunner) ) { //
                         var19 = this.getEntityBySeatId(0);
                      }
 
 
 
 
-                     if(var19 instanceof EntityPlayer) {
+                     if(var19 instanceof EntityPlayer || var19 instanceof MCH_EntityGunner) {
                         float var22;
                         if((int)var17.minYaw != 0 || (int)var17.maxYaw != 0) {
                            var22 = var17.turret?MathHelper.wrapAngleTo180_float(this.getLastRiderYaw()) - yaw:0.0F;
@@ -5418,11 +5424,11 @@ public abstract class MCH_EntityAircraft extends W_EntityContainer implements MC
                   MCH_AircraftInfo.Weapon wi = this.getAcInfo().getWeaponById(wid);
                   if(wi != null) {
                      Entity entity = this.getEntityBySeatId(this.getWeaponSeatID(this.getWeaponInfoById(wid), wi));
-                     if (wi.canUsePilot && !(entity instanceof EntityPlayer) ) { //&& !(entity instanceof mcheli.mob.MCH_EntityGunner)
+                     if (wi.canUsePilot && !(entity instanceof EntityPlayer) && !(entity instanceof mcheli.mob.MCH_EntityGunner)) { //
                         /* 5125 */             entity = getEntityBySeatId(0);
                         /*      */           }
 
-                     if(entity instanceof EntityPlayer) {
+                     if(entity instanceof EntityPlayer || entity instanceof MCH_EntityGunner) {
                         float ep;
                         if((int)wi.minYaw != 0 || (int)wi.maxYaw != 0) {
                            ep = wi.turret?MathHelper.wrapAngleTo180_float(this.getLastRiderYaw()) - yaw:0.0F;

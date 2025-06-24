@@ -162,7 +162,7 @@ public class W_Reflection {
 
 	   public static void setBoundingBox(Entity entity, AxisAlignedBB bb) {
 	      try {
-	         ObfuscationReflectionHelper.setPrivateValue(Entity.class, entity, bb, new String[]{"field_70121_D", "boundingBox"});
+	         ObfuscationReflectionHelper.setPrivateValue(Entity.class, entity, bb, new String[]{"boundingBox", "boundingBox"});
 	      } catch (Exception var3) {
 	         var3.printStackTrace();
 	      }

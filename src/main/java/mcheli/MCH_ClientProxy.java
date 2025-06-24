@@ -33,6 +33,8 @@ import mcheli.helicopter.MCH_HeliInfoManager;
 import mcheli.helicopter.MCH_RenderHeli;
 import mcheli.hud.MCH_HudManager;
 import mcheli.lweapon.MCH_ItemLightWeaponRender;
+import mcheli.mob.MCH_EntityGunner;
+import mcheli.mob.MCH_RenderGunner;
 import mcheli.multiplay.MCH_MultiplayClient;
 import mcheli.parachute.MCH_EntityParachute;
 import mcheli.parachute.MCH_RenderParachute;
@@ -107,6 +109,7 @@ public class MCH_ClientProxy extends MCH_CommonProxy {
       RenderingRegistry.registerEntityRenderingHandler(MCH_EntityDispensedItem.class, new MCH_RenderNone());
       RenderingRegistry.registerEntityRenderingHandler(MCH_EntityFlare.class, new MCH_RenderFlare());
       RenderingRegistry.registerEntityRenderingHandler(MCH_EntityThrowable.class, new MCH_RenderThrowable());
+      RenderingRegistry.registerEntityRenderingHandler(MCH_EntityGunner.class, new MCH_RenderGunner());
       RenderingRegistry.registerEntityRenderingHandler(MCH_EntityLockBox.class, new MCH_RenderLockBox());
       RenderingRegistry.registerEntityRenderingHandler(MCH_EntityChaff.class, new MCH_RenderChaff());
       W_MinecraftForgeClient.registerItemRenderer(MCH_MOD.itemJavelin, new MCH_ItemLightWeaponRender());
