@@ -27,4 +27,3 @@ gradle.properties
 /run
 /src/main/resources/assets
 /lib
-/.gradle
